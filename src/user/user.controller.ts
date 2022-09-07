@@ -4,6 +4,7 @@ import {
   Get,
   Post,
   Put,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { User } from 'src/common/decorators/user.decorator';
@@ -17,8 +18,8 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Post() // 회원가입
-  signUp(@Body() data: SignUpRequestDto) {
-    this.userService.signUp(data);
+  async signUp(@Body() body: SignUpRequestDto) {
+    await this.userService.signUp(body);
   }
 
   @Get() // 로그인한 유저 정보
