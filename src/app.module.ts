@@ -11,6 +11,7 @@ import ormconfig from 'ormconfig';
 import { UserController } from './user/user.controller';
 import { UserService } from './user/user.service';
 import { User } from './entities/User';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { User } from './entities/User';
     UserModule,
     TypeOrmModule.forRoot(ormconfig),
     TypeOrmModule.forFeature([User]),
+    AuthModule,
   ],
   controllers: [AppController, PlanController, UserController],
   providers: [AppService, ConfigService, PlanService, UserService],

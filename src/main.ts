@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './http-exception.filter';
+import passport from 'passport';
 declare const module: any;
 
 async function bootstrap() {
@@ -9,6 +10,8 @@ async function bootstrap() {
   const port = process.env.PORT || 3000;
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(new ValidationPipe());
+  app.use(passport.initialize());
+
   await app.listen(port);
   console.log(`listening on port ${port}`);
 

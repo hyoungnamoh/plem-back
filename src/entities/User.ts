@@ -36,7 +36,7 @@ export class User {
 
   @IsNotEmpty()
   @Length(8, 20)
-  @Column('varchar', { name: 'password', length: 100 })
+  @Column('varchar', { name: 'password', length: 100, select: false })
   @IsString()
   @Matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/)
   password: string;
