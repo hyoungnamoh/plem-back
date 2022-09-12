@@ -10,8 +10,9 @@ import {
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 import { LoggedInGuard } from 'src/auth/logged-in.guard';
 import { NotLoggedInGuard } from 'src/auth/not-logged-in.guard';
-import { User } from 'src/common/decorators/user.decorator';
+import { UserDeco } from 'src/common/decorators/user.decorator';
 import { UndefinedToNullInterceptor } from 'src/common/interceptors/undefinedToNull.interceptor';
+import { User } from 'src/entities/User';
 import { SignUpRequestDto } from './dto/sign-up.request.dto';
 import { UserService } from './user.service';
 
@@ -21,7 +22,7 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Post() // 회원가입
-  @UseGuards(new NotLoggedInGuard())
+  @UseGuards(NotLoggedInGuard)
   async signUp(@Body() body: SignUpRequestDto) {
     await this.userService.signUp(body);
   }
@@ -29,7 +30,7 @@ export class UserController {
   // res.locals 미들웨어간에 공유할 수 있는 변수역할
   // res.locals.jwt
   @Get() // 로그인한 유저 정보
-  getUser(@User() user) {
+  getUser(@UserDeco() user) {
     return user;
   }
 
@@ -39,25 +40,25 @@ export class UserController {
   @Put() // 계정 삭제
   deleteUser() {}
 
-  @UseGuards(new LocalAuthGuard()) // 주로 권한, 로그인(401, 403) 처리
+  @UseGuards(LocalAuthGuard) // 주로 권한, 로그인(401, 403) 처리
   @Post('/login') // 로그인
-  login(@User() user) {
+  async logIn(@UserDeco() user: User) {
     return user; // nest가 res.json(user) 로 변환해서 보내줌
   }
 
-  @UseGuards(new LoggedInGuard())
+  @UseGuards(LoggedInGuard)
   @Post('/logout') // 로그아웃
-  logout() {}
+  logOut() {}
 
-  @UseGuards(new NotLoggedInGuard())
+  @UseGuards(NotLoggedInGuard)
   @Get('/verification-code') // 비밀번호 찾기
   findPassword() {}
 
-  @UseGuards(new NotLoggedInGuard())
+  @UseGuards(NotLoggedInGuard)
   @Post('/verification-code') // 인증번호 전송
   postVerificationCode() {}
 
-  @UseGuards(new NotLoggedInGuard())
+  @UseGuards(NotLoggedInGuard)
   @Get('/verification-code/verify') // 인증번호 체크
   checkVerifyCode() {}
 }

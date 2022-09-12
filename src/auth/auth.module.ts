@@ -8,7 +8,7 @@ import { LocalStrategy } from './local.strategy';
 
 @Module({
   imports: [
-    PassportModule.register({ session: false }),
+    PassportModule.register({ session: true }),
     TypeOrmModule.forFeature([User]),
   ],
   providers: [AuthService, LocalStrategy, LocalSerializer],
