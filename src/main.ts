@@ -28,7 +28,7 @@ async function bootstrap() {
   app.use(passport.session());
 
   await app.listen(port);
-  console.log(`listening on port ${port}`);
+  console.info(`listening on port ${port}`);
 
   if (module.hot) {
     module.hot.accept();

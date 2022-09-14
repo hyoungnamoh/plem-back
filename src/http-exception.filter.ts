@@ -25,10 +25,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         data: err.message,
       });
     }
-
     // 내가 발생시킨 에러 ex) 이메일 중복체크
-    response
-      .status(status)
-      .json({ success: false, code: status, data: err.message });
+    response.status(status).json({ success: false, code: status, data: err });
   }
 }
