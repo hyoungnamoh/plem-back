@@ -3,7 +3,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './http-exception.filter';
 import passport from 'passport';
-import session from 'express-session';
 import cookieParser from 'cookie-parser';
 
 declare const module: any;
@@ -12,20 +11,13 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = process.env.PORT || 3000;
   app.useGlobalFilters(new HttpExceptionFilter());
-  app.useGlobalPipes(new ValidationPipe());
-  app.use(cookieParser());
-  app.use(
-    session({
-      resave: false,
-      saveUninitialized: false,
-      secret: process.env.COOKIE_SECRET,
-      cookie: {
-        httpOnly: true,
-      },
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
     }),
   );
+  app.use(cookieParser());
   app.use(passport.initialize());
-  app.use(passport.session());
 
   await app.listen(port);
   console.info(`listening on port ${port}`);

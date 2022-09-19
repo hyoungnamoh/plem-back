@@ -39,9 +39,11 @@ export class UserController {
   }
 
   @Put() // 내 정보 수정
+  @UseGuards(JwtAuthGuard)
   putUser() {}
 
   @Put() // 계정 삭제
+  @UseGuards(JwtAuthGuard)
   deleteUser() {}
 
   @Post('/login')
@@ -53,6 +55,7 @@ export class UserController {
   }
 
   @Post('/logout') // 로그아웃
+  @UseGuards(JwtAuthGuard)
   logOut() {}
 
   @Get('/verification-code') // 비밀번호 찾기

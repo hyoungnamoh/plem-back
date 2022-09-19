@@ -1,3 +1,4 @@
+import { IsNotEmpty, IsNumber, IsString, Length } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
@@ -12,22 +13,23 @@ import {
 import { PlanChart } from './PlanChart';
 import { SubPlan } from './SubPlan';
 
-@Index('plan_chart_id', ['planChartId'], {})
+@Index('plan_chart_id', ['PlanChartId'], {})
 @Entity('PLAN', { schema: 'plem' })
 export class Plan {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;
 
-  @Column('int', { name: 'plan_chart_id', nullable: true })
-  planChartId: number | null;
+  @Column('int', { name: 'plan_chart_id', nullable: false })
+  @IsNumber(undefined, { each: true })
+  @IsNotEmpty()
+  PlanChartId: number;
 
+  @IsString()
+  @IsNotEmpty()
+  @Length(1, 30)
   @Column('varchar', { name: 'name', length: 100 })
   name: string;
 
-  // @Column('datetime', {
-  //   name: 'created_at',
-  //   default: () => 'CURRENT_TIMESTAMP',
-  // })
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

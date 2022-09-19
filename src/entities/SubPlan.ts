@@ -10,14 +10,14 @@ import {
 } from 'typeorm';
 import { Plan } from './Plan';
 
-@Index('plan_id', ['planId'], {})
+@Index('plan_id', ['PlanId'], {})
 @Entity('SUB_PLAN', { schema: 'plem' })
 export class SubPlan {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;
 
   @Column('int', { name: 'plan_id', nullable: true })
-  planId: number | null;
+  PlanId: number | null;
 
   @Column('varchar', { name: 'name', length: 100 })
   name: string;

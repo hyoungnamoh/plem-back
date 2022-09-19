@@ -1,3 +1,4 @@
+import { ArrayNotEmpty, IsArray, IsIn, IsNotEmpty } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
@@ -12,14 +13,14 @@ import {
 import { Plan } from './Plan';
 import { User } from './User';
 
-@Index('user_id', ['userId'], {})
+@Index('user_id', ['UserId'], {})
 @Entity('PLAN_CHART', { schema: 'plem' })
 export class PlanChart {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;
 
   @Column('int', { name: 'user_id', nullable: true })
-  userId: number | null;
+  UserId: number | null;
 
   @Column('varchar', { name: 'name', length: 100 })
   name: string;
@@ -35,6 +36,8 @@ export class PlanChart {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date | null;
 
+  @IsArray()
+  @ArrayNotEmpty()
   @OneToMany(() => Plan, (plan) => plan.PlanChart)
   Plans: Plan[];
 
