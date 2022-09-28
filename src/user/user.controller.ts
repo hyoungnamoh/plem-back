@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Post,
   Put,
@@ -14,6 +15,7 @@ import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 import { UserDeco } from 'src/common/decorators/user.decorator';
 import { UndefinedToNullInterceptor } from 'src/common/interceptors/undefinedToNull.interceptor';
 import { User } from 'src/entities/User';
+import { ChangeMyInfoRequestDto } from './dto/change-my-info.request.dto';
 import { SignUpRequestDto } from './dto/sign-up.request.dto';
 import { UserService } from './user.service';
 
@@ -40,7 +42,9 @@ export class UserController {
 
   @Put() // 내 정보 수정
   @UseGuards(JwtAuthGuard)
-  putUser() {}
+  async putUser(@UserDeco() user: User, @Body() body: ChangeMyInfoRequestDto) {
+    await this.userService.putUser(user, body);
+  }
 
   @Put() // 계정 삭제
   @UseGuards(JwtAuthGuard)
