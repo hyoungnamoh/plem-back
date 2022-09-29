@@ -39,7 +39,9 @@ export class PlanChartController {
 
   // 일정표 삭제
   @Delete('/:id')
-  deletePlanChart(@Param() param) {}
+  async deletePlanChart(@Body() body: { id: number }) {
+    await this.planChartService.deletePlanChart(body);
+  }
 
   // 일정표 리스트
   @Get('/list')

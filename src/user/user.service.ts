@@ -54,4 +54,28 @@ export class UserService {
     //   password: hashedPassword,
     // });
   }
+
+  async deleteUser({ email, password }: User & { password: string }) {
+    const user = await this.userRepository.findOne({
+      where: { email },
+      select: ['password'],
+    });
+
+    if (!user) {
+      throw new HttpException('존재하지 않은 유저입니다.', 401);
+    }
+
+    const result = await bcrypt.compare(password, user.password);
+
+    if (!result) {
+      throw new HttpException('비밀번호가 일치하지 않습니다', 401);
+    }
+
+    await this.userRepository
+      .createQueryBuilder('user')
+      .softDelete()
+      .from(User)
+      .where('user.email = :email', { email })
+      .execute();
+  }
 }

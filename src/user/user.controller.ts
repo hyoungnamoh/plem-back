@@ -46,9 +46,11 @@ export class UserController {
     await this.userService.putUser(user, body);
   }
 
-  @Put() // 계정 삭제
+  @Delete('/delete') // 계정 삭제
   @UseGuards(JwtAuthGuard)
-  deleteUser() {}
+  async deleteUser(@UserDeco() user: User, @Body() body: { password: string }) {
+    await this.userService.deleteUser({ ...user, ...body });
+  }
 
   @Post('/login')
   @UseGuards(LocalAuthGuard)

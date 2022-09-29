@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Plan } from 'src/entities/Plan';
 import { PlanChart } from 'src/entities/PlanChart';
@@ -42,6 +42,9 @@ export class PlanChartService {
       .createQueryBuilder('planChart')
       .where('planChart.id = :id', { id })
       .getOne();
+    if (!planChart) {
+      throw new HttpException('존재하지 않은 일정표입니다.', 401);
+    }
     const plans = await this.planRepository
       .createQueryBuilder('plan')
       .where('plan.PlanChartId = :id', { id })
@@ -51,5 +54,18 @@ export class PlanChartService {
     return {
       planChart,
     };
+  }
+
+  async deletePlanChart({ id }) {
+    const planChart = await this.planChartRepository.findOne({ where: { id } });
+    if (!planChart) {
+      throw new HttpException('존자해지 않는 일정표입니다.', 401);
+    }
+    await this.planChartRepository
+      .createQueryBuilder()
+      .delete()
+      .from(PlanChart)
+      .where('id = :id', { id })
+      .execute();
   }
 }
