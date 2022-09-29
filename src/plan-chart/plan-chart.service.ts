@@ -68,4 +68,20 @@ export class PlanChartService {
       .where('id = :id', { id })
       .execute();
   }
+
+  async getPlanChartList({ page, userId }) {
+    const planChartList = await this.planChartRepository.find({
+      where: { UserId: userId },
+    });
+    console.log(planChartList);
+    // if (!planChart) {
+    //   throw new HttpException('존자해지 않는 일정표입니다.', 401);
+    // }
+    // await this.planChartRepository
+    //   .createQueryBuilder()
+    //   .delete()
+    //   .from(PlanChart)
+    //   .where('id = :id', { id })
+    //   .execute();
+  }
 }
