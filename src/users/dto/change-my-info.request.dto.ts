@@ -6,11 +6,11 @@ import {
   Length,
   Matches,
 } from 'class-validator';
-import { User } from 'src/entities/User';
+import { Users } from 'src/entities/Users';
 import { Column } from 'typeorm';
 
 // 정보 수정할 때 수정 api 하나로 쓸 건지 비번 / 정보 수정 api 나눌 건지
-export class ChangeMyInfoRequestDto extends PickType(User, [
+export class ChangeMyInfoRequestDto extends PickType(Users, [
   'password',
   'nickname',
 ] as const) {

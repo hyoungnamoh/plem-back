@@ -1,16 +1,16 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/entities/User';
+import { Users } from 'src/entities/Users';
 import { Repository } from 'typeorm';
 import { SignUpRequestDto } from './dto/sign-up.request.dto';
 import bcrypt from 'bcrypt';
 import { ChangeMyInfoRequestDto } from './dto/change-my-info.request.dto';
 @Injectable()
-export class UserService {
+export class UsersService {
   // service(business logic)는 repo(이어주는 역할)를 통해 entitiy(table)에 쿼리를 날림
   constructor(
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
+    @InjectRepository(Users)
+    private userRepository: Repository<Users>,
   ) {}
   async signUp({ email, password, nickname }: SignUpRequestDto) {
     const user = await this.userRepository.findOne({
@@ -30,7 +30,7 @@ export class UserService {
   }
 
   async putUser(
-    { email }: User,
+    { email }: Users,
     { password, nickname, newPassword }: ChangeMyInfoRequestDto,
   ) {
     const user = await this.userRepository.findOne({
@@ -55,7 +55,7 @@ export class UserService {
     // });
   }
 
-  async deleteUser({ email, password }: User & { password: string }) {
+  async deleteUser({ email, password }: Users & { password: string }) {
     const user = await this.userRepository.findOne({
       where: { email },
       select: ['password'],
@@ -74,7 +74,7 @@ export class UserService {
     await this.userRepository
       .createQueryBuilder('user')
       .softDelete()
-      .from(User)
+      .from(Users)
       .where('user.email = :email', { email })
       .execute();
   }

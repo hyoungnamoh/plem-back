@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Plan } from 'src/entities/Plan';
+import { Plans } from 'src/entities/Plans';
 import { Repository } from 'typeorm';
 import { CreatePlanDto } from './dto/create-plan.dto';
 
 @Injectable()
-export class PlanService {
+export class PlansService {
   constructor(
-    @InjectRepository(Plan) private planRepository: Repository<Plan>,
+    @InjectRepository(Plans) private planRepository: Repository<Plans>,
   ) {}
 
   async getPlan({ id }: { id: number }) {
@@ -15,7 +15,7 @@ export class PlanService {
   }
 
   async postPlan({ name, PlanChartId }: CreatePlanDto) {
-    const plan = new Plan();
+    const plan = new Plans();
     plan.name = name;
     plan.PlanChartId = PlanChartId;
     const planReturned = await this.planRepository.save(plan);

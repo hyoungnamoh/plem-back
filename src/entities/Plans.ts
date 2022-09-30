@@ -10,12 +10,12 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { PlanChart } from './PlanChart';
-import { SubPlan } from './SubPlan';
+import { PlanCharts } from './PlanCharts';
+import { SubPlans } from './SubPlans';
 
 @Index('plan_chart_id', ['PlanChartId'], {})
-@Entity('PLAN', { schema: 'plem' })
-export class Plan {
+@Entity('PLANS', { schema: 'plem' })
+export class Plans {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;
 
@@ -37,13 +37,13 @@ export class Plan {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date | null;
 
-  @ManyToOne(() => PlanChart, (planChart) => planChart.Plans, {
+  @ManyToOne(() => PlanCharts, (planCharts) => planCharts.Plans, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
   @JoinColumn([{ name: 'plan_chart_id', referencedColumnName: 'id' }])
-  PlanChart: PlanChart;
+  PlanChart: PlanCharts;
 
-  @OneToMany(() => SubPlan, (subPlan) => subPlan.Plan)
-  SubPlans: SubPlan[];
+  @OneToMany(() => SubPlans, (subPlans) => subPlans.Plan)
+  SubPlans: SubPlans[];
 }

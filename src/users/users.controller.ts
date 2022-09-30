@@ -14,16 +14,16 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 import { UserDeco } from 'src/common/decorators/user.decorator';
 import { UndefinedToNullInterceptor } from 'src/common/interceptors/undefinedToNull.interceptor';
-import { User } from 'src/entities/User';
+import { Users } from 'src/entities/Users';
 import { ChangeMyInfoRequestDto } from './dto/change-my-info.request.dto';
 import { SignUpRequestDto } from './dto/sign-up.request.dto';
-import { UserService } from './user.service';
+import { UsersService } from './users.service';
 
 @UseInterceptors(UndefinedToNullInterceptor)
-@Controller('/user')
-export class UserController {
+@Controller('/users')
+export class UsersController {
   constructor(
-    private userService: UserService,
+    private userService: UsersService,
     private authService: AuthService,
   ) {}
 
@@ -36,25 +36,28 @@ export class UserController {
   // res.locals.jwt
   @Get() // 로그인한 유저 정보
   @UseGuards(JwtAuthGuard)
-  getUser(@UserDeco() user: User) {
+  getUser(@UserDeco() user: Users) {
     return user;
   }
 
   @Put() // 내 정보 수정
   @UseGuards(JwtAuthGuard)
-  async putUser(@UserDeco() user: User, @Body() body: ChangeMyInfoRequestDto) {
+  async putUser(@UserDeco() user: Users, @Body() body: ChangeMyInfoRequestDto) {
     await this.userService.putUser(user, body);
   }
 
   @Delete('/delete') // 계정 삭제
   @UseGuards(JwtAuthGuard)
-  async deleteUser(@UserDeco() user: User, @Body() body: { password: string }) {
+  async deleteUser(
+    @UserDeco() user: Users,
+    @Body() body: { password: string },
+  ) {
     await this.userService.deleteUser({ ...user, ...body });
   }
 
   @Post('/login')
   @UseGuards(LocalAuthGuard)
-  login(@UserDeco() user: User) {
+  login(@UserDeco() user: Users) {
     const token = this.authService.login(user);
 
     return token;

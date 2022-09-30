@@ -1,3 +1,4 @@
+import { ArrayNotEmpty, IsArray, IsIn, IsNotEmpty } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
@@ -5,19 +6,21 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Plan } from './Plan';
+import { Users } from './Users';
+import { Plans } from './Plans';
 
-@Index('plan_id', ['PlanId'], {})
-@Entity('SUB_PLAN', { schema: 'plem' })
-export class SubPlan {
+@Index('user_id', ['UserId'], {})
+@Entity('PLAN_CHARTS', { schema: 'plem' })
+export class PlanCharts {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;
 
-  @Column('int', { name: 'plan_id', nullable: true })
-  PlanId: number | null;
+  @Column('int', { name: 'user_id', nullable: true })
+  UserId: number | null;
 
   @Column('varchar', { name: 'name', length: 100 })
   name: string;
@@ -33,10 +36,15 @@ export class SubPlan {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date | null;
 
-  @ManyToOne(() => Plan, (plan) => plan.SubPlans, {
+  @IsArray()
+  @ArrayNotEmpty()
+  @OneToMany(() => Plans, (plan) => plan.PlanChart)
+  Plans: Plans[];
+
+  @ManyToOne(() => Users, (users) => users.PlanCharts, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn([{ name: 'plan_id', referencedColumnName: 'id' }])
-  Plan: Plan;
+  @JoinColumn([{ name: 'user_id', referencedColumnName: 'id' }])
+  User: Users;
 }

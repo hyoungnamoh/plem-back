@@ -1,19 +1,19 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Plan } from 'src/entities/Plan';
-import { PlanChart } from 'src/entities/PlanChart';
-import { PlanService } from 'src/plan/plan.service';
+import { Plans } from 'src/entities/Plans';
+import { PlanCharts } from 'src/entities/PlanCharts';
+import { PlansService } from 'src/plans/plans.service';
 import { Repository } from 'typeorm';
 import { CreatePlanChartDto } from './dto/create-plan-chart.dto';
 
 @Injectable()
-export class PlanChartService {
+export class PlanChartsService {
   constructor(
-    @InjectRepository(PlanChart)
-    private planChartRepository: Repository<PlanChart>,
-    @InjectRepository(Plan)
-    private planRepository: Repository<Plan>,
-    private planService: PlanService,
+    @InjectRepository(PlanCharts)
+    private planChartRepository: Repository<PlanCharts>,
+    @InjectRepository(Plans)
+    private planRepository: Repository<Plans>,
+    private planService: PlansService,
   ) {}
 
   async postPlanChart({
@@ -21,7 +21,7 @@ export class PlanChartService {
     Plans,
     userId,
   }: CreatePlanChartDto & { userId: number }) {
-    const planChart = new PlanChart();
+    const planChart = new PlanCharts();
 
     planChart.UserId = userId;
     planChart.name = name;
@@ -64,7 +64,7 @@ export class PlanChartService {
     await this.planChartRepository
       .createQueryBuilder()
       .delete()
-      .from(PlanChart)
+      .from(PlanCharts)
       .where('id = :id', { id })
       .execute();
   }
@@ -80,7 +80,7 @@ export class PlanChartService {
     // await this.planChartRepository
     //   .createQueryBuilder()
     //   .delete()
-    //   .from(PlanChart)
+    //   .from(PlanCharts)
     //   .where('id = :id', { id })
     //   .execute();
   }

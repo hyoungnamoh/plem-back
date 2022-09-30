@@ -9,11 +9,11 @@ import {
   Query,
 } from '@nestjs/common';
 import { CreatePlanDto } from './dto/create-plan.dto';
-import { PlanService } from './plan.service';
+import { PlansService } from './plans.service';
 
-@Controller('/plan')
-export class PlanController {
-  constructor(private planService: PlanService) {}
+@Controller('/plans')
+export class PlansController {
+  constructor(private planService: PlansService) {}
   // 일정 생성
   @Post()
   postPlan(@Body() body: CreatePlanDto) {

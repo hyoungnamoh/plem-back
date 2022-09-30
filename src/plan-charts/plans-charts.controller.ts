@@ -11,17 +11,17 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UserDeco } from 'src/common/decorators/user.decorator';
-import { User } from 'src/entities/User';
+import { Users } from 'src/entities/Users';
 import { CreatePlanChartDto } from './dto/create-plan-chart.dto';
-import { PlanChartService } from './plan-chart.service';
+import { PlanChartsService } from './plan-charts.service';
 
-@Controller('plan-chart')
-export class PlanChartController {
-  constructor(private planChartService: PlanChartService) {}
+@Controller('plan-charts')
+export class PlanChartsController {
+  constructor(private planChartService: PlanChartsService) {}
   // 일정표 생성
   @Post('')
   @UseGuards(JwtAuthGuard)
-  postPlanChart(@Body() body: CreatePlanChartDto, @UserDeco() user: User) {
+  postPlanChart(@Body() body: CreatePlanChartDto, @UserDeco() user: Users) {
     this.planChartService.postPlanChart(
       Object.assign(body, { userId: user.id }),
     );

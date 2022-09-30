@@ -15,11 +15,11 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { PlanChart } from './PlanChart';
+import { PlanCharts } from './PlanCharts';
 
 @Index('email', ['email'], { unique: true })
-@Entity('USER', { schema: 'plem' })
-export class User {
+@Entity('USERS', { schema: 'plem' })
+export class Users {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' }) // name: db 컬럼명
   id: number; // js단에서 사용할 변수명
 
@@ -62,6 +62,6 @@ export class User {
   @DeleteDateColumn({ name: 'deleted_at' })
   deletedAt: Date | null;
 
-  @OneToMany(() => PlanChart, (planChart) => planChart.User)
-  PlanCharts: PlanChart[];
+  @OneToMany(() => PlanCharts, (planChart) => planChart.User)
+  PlanCharts: PlanCharts;
 }
