@@ -39,7 +39,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         case 'TOKEN_IS_ARRAY':
         case 'NO_USER':
         case 'invalid signature':
-          throw new HttpException('유효하지 않은 토큰입니다.', 401);
+          throw new HttpException('유효하지 않은 토큰입니다.', 410);
 
         case 'EXPIRED_TOKEN':
         case 'jwt expired':

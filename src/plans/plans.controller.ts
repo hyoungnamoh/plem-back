@@ -35,6 +35,6 @@ export class PlansController {
   deletePlan(@Param() param) {}
 
   // 일정 리스트
-  @Get('/list')
+  @Get('')
   getPlanList(@Query() query) {}
 }

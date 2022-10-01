@@ -44,6 +44,9 @@ export class PlanChartsController {
   }
 
   // 일정표 리스트
-  @Get('/list')
-  getPlanChartList(@Query() query) {}
+  @Get('')
+  @UseGuards(JwtAuthGuard)
+  getPlanCharts(@Query() query: { page: number }, @UserDeco() user: Users) {
+    return this.planChartService.getPlanCharts({ ...query, userId: user.id });
+  }
 }

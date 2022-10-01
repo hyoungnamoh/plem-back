@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Plans } from 'src/entities/Plans';
 import { Repository } from 'typeorm';
@@ -11,7 +11,11 @@ export class PlansService {
   ) {}
 
   async getPlan({ id }: { id: number }) {
-    return this.planRepository.findOne({ where: { id } });
+    const plan = await this.planRepository.findOne({ where: { id } });
+    if (!plan) {
+      throw new HttpException('존재하지 않는 일정입니다.', 400);
+    }
+    return plan;
   }
 
   async postPlan({ name, PlanChartId }: CreatePlanDto) {

@@ -43,7 +43,7 @@ export class PlanChartsService {
       .where('planChart.id = :id', { id })
       .getOne();
     if (!planChart) {
-      throw new HttpException('존재하지 않은 일정표입니다.', 401);
+      throw new HttpException('존재하지 않은 일정표입니다.', 400);
     }
     const plans = await this.planRepository
       .createQueryBuilder('plan')
@@ -59,7 +59,7 @@ export class PlanChartsService {
   async deletePlanChart({ id }) {
     const planChart = await this.planChartRepository.findOne({ where: { id } });
     if (!planChart) {
-      throw new HttpException('존자해지 않는 일정표입니다.', 401);
+      throw new HttpException('존자해지 않는 일정표입니다.', 400);
     }
     await this.planChartRepository
       .createQueryBuilder()
@@ -69,19 +69,10 @@ export class PlanChartsService {
       .execute();
   }
 
-  async getPlanChartList({ page, userId }) {
-    const planChartList = await this.planChartRepository.find({
+  async getPlanCharts({ page, userId }) {
+    const planCharts = await this.planChartRepository.find({
       where: { UserId: userId },
     });
-    console.log(planChartList);
-    // if (!planChart) {
-    //   throw new HttpException('존자해지 않는 일정표입니다.', 401);
-    // }
-    // await this.planChartRepository
-    //   .createQueryBuilder()
-    //   .delete()
-    //   .from(PlanCharts)
-    //   .where('id = :id', { id })
-    //   .execute();
+    return planCharts;
   }
 }

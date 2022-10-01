@@ -18,7 +18,7 @@ export class UsersService {
       withDeleted: true,
     });
     if (user) {
-      throw new HttpException('이미 사용중인 이메일입니다!', 401);
+      throw new HttpException('이미 사용중인 이메일입니다!', 400);
     }
     const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -42,17 +42,6 @@ export class UsersService {
     if (result) {
       const hashedPassword = await bcrypt.hash(password, 12);
     }
-
-    // const user = await this.userRepository.findOne({ where: { email } });
-    // if (user) {
-    //   throw new HttpException('이미 사용중인 이메일입니다!', 401);
-    // }
-    // const hashedPassword = await bcrypt.hash(password, 12);
-    // await this.userRepository.save({
-    //   email,
-    //   nickname,
-    //   password: hashedPassword,
-    // });
   }
 
   async deleteUser({ email, password }: Users & { password: string }) {
