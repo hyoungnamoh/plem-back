@@ -17,16 +17,39 @@ import { PlanChartsModule } from './plan-charts/plan-charts.module';
 import { PlanChartsService } from './plan-charts/plan-charts.service';
 import { PlanCharts } from './entities/PlanCharts';
 import { PlanChartsController } from './plan-charts/plans-charts.controller';
+import configEmail from './config/email';
+import { MailerModule } from '@nestjs-modules/mailer';
+import * as path from 'path';
+import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, load: [configEmail] }),
     PlansModule,
     UsersModule,
     TypeOrmModule.forRoot(ormconfig),
     TypeOrmModule.forFeature([Users, Plans, PlanCharts]),
     AuthModule,
     PlanChartsModule,
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        console.log(config.get('email'));
+        return {
+          ...config.get('email'),
+          template: {
+            dir: path.join(__dirname, '/templates/'),
+            adapter: new EjsAdapter(),
+            options: {
+              strict: true,
+            },
+          },
+        };
+      },
+    }),
+    EmailModule,
   ],
   controllers: [
     AppController,

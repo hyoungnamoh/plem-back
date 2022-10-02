@@ -13,23 +13,25 @@ import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 import { UserDeco } from 'src/common/decorators/user.decorator';
-import { UndefinedToNullInterceptor } from 'src/common/interceptors/undefinedToNull.interceptor';
+import { SuccessResponseInterceptor } from 'src/common/interceptors/successResponse.interceptor';
+import { EmailService } from 'src/email/email.service';
 import { Users } from 'src/entities/Users';
 import { ChangeMyInfoRequestDto } from './dto/change-my-info.request.dto';
 import { SignUpRequestDto } from './dto/sign-up.request.dto';
 import { UsersService } from './users.service';
 
-@UseInterceptors(UndefinedToNullInterceptor)
+@UseInterceptors(SuccessResponseInterceptor)
 @Controller('/users')
 export class UsersController {
   constructor(
     private userService: UsersService,
     private authService: AuthService,
+    private emailService: EmailService,
   ) {}
 
   @Post() // 회원가입
   async signUp(@Body() body: SignUpRequestDto) {
-    await this.userService.signUp(body);
+    return await this.userService.signUp(body);
   }
 
   // res.locals 미들웨어간에 공유할 수 있는 변수역할
@@ -63,16 +65,23 @@ export class UsersController {
     return token;
   }
 
-  @Post('/logout') // 로그아웃
-  @UseGuards(JwtAuthGuard)
-  logOut() {}
-
-  @Get('/verification-code') // 비밀번호 찾기
-  findPassword() {}
-
   @Post('/verification-code') // 인증번호 전송
-  postVerificationCode() {}
+  async postVerificationCode(@Body() body: { to: string }) {
+    return await this.emailService.sendVerificationCode(body);
+  }
 
-  @Get('/verification-code/verify') // 인증번호 체크
-  checkVerifyCode() {}
+  @Post('/make-nickname')
+  async makeNickname(@Body() body: { to: string }) {
+    // return await this.emailService.sendVerificationCode(body);
+  }
+
+  // @Post('/logout') // 로그아웃
+  // @UseGuards(JwtAuthGuard)
+  // logOut() {}
+
+  // @Get('/verification-code') // 비밀번호 찾기
+  // findPassword() {}
+
+  // @Get('/verification-code/verify') // 인증번호 체크
+  // checkVerifyCode() {}
 }
