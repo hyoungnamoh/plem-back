@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from 'src/entities/Users';
 import { Repository } from 'typeorm';
@@ -7,12 +7,16 @@ import bcrypt from 'bcrypt';
 import { ChangeMyInfoRequestDto } from './dto/change-my-info.request.dto';
 @Injectable()
 export class UsersService {
-  // service(business logic)는 repo(이어주는 역할)를 통해 entitiy(table)에 쿼리를 날림
+  // service(business logic)는 repo(이어주는 역할)를 통해 entitiy(table)에 쿼리를 날림
   constructor(
     @InjectRepository(Users)
-    private userRepository: Repository<Users>,
+    private userRepository: Repository<Users>
   ) {}
-  async signUp({ email, password, nickname }: SignUpRequestDto) {
+
+  async signUp({ email, password, checkPassword }: SignUpRequestDto) {
+    if (password !== checkPassword) {
+      throw new HttpException('비밀번호가 일치하지 않습니다!', 400);
+    }
     const user = await this.userRepository.findOne({
       where: { email },
       withDeleted: true,
@@ -24,15 +28,11 @@ export class UsersService {
 
     await this.userRepository.save({
       email,
-      nickname,
       password: hashedPassword,
     });
   }
 
-  async putUser(
-    { email }: Users,
-    { password, nickname, newPassword }: ChangeMyInfoRequestDto,
-  ) {
+  async putUser({ email }: Users, { password, nickname, newPassword }: ChangeMyInfoRequestDto) {
     const user = await this.userRepository.findOne({
       where: { email },
       select: ['password'],
@@ -51,13 +51,13 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new HttpException('존재하지 않은 유저입니다.', 401);
+      throw new UnauthorizedException('존재하지 않는 유저입니다.');
     }
 
     const result = await bcrypt.compare(password, user.password);
 
     if (!result) {
-      throw new HttpException('비밀번호가 일치하지 않습니다', 401);
+      throw new UnauthorizedException('비밀번호가 일치하지 않습니다');
     }
 
     await this.userRepository

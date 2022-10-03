@@ -1,10 +1,4 @@
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsString,
-  Length,
-  Matches,
-} from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, Length, Matches } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
@@ -23,22 +17,28 @@ export class Users {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' }) // name: db 컬럼명
   id: number; // js단에서 사용할 변수명
 
-  @IsEmail()
-  @IsNotEmpty()
+  @IsEmail(null, { message: '이메일 형식을 확인해주세요.' })
+  @IsNotEmpty({ message: '이메일 형식을 확인해주세요.' })
   @Column('varchar', { name: 'email', unique: true, length: 320 })
   email: string;
 
-  @IsString()
-  @IsNotEmpty()
-  @Length(2, 12)
-  @Column('varchar', { name: 'nickname', length: 100 })
+  @IsString({ message: '닉네임은 한글 또는 영문 2~12자로 입력해주세요.' })
+  @IsNotEmpty({ message: '닉네임은 한글 또는 영문 2~12자로 입력해주세요.' })
+  @Length(2, 12, { message: '닉네임은 한글 또는 영문 2~12자로 입력해주세요.' })
+  @Column('varchar', { name: 'nickname', length: 100, nullable: true })
   nickname: string;
 
-  @IsNotEmpty()
-  @Length(8, 20)
   @Column('varchar', { name: 'password', length: 100, select: false })
-  @IsString()
-  @Matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/)
+  @IsNotEmpty({ message: '비밀번호를 입력해주세요.' })
+  @Length(8, 20, {
+    message: '비밀번호는 숫자, 문자, 특수문자 조합 8~20자로 입력해주세요',
+  })
+  @IsString({
+    message: '비밀번호는 숫자, 문자, 특수문자 조합 8~20자로 입력해주세요',
+  })
+  @Matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/, {
+    message: '비밀번호는 숫자, 문자, 특수문자 조합 8~20자로 입력해주세요',
+  })
   password: string;
 
   @Column('tinyint', { name: 'is_certified', width: 1, default: () => "'0'" })

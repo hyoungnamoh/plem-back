@@ -8,7 +8,7 @@ import { map, Observable } from 'rxjs';
 
 // 컨트롤러 실행 전, 후
 @Injectable()
-export class UndefinedToNullInterceptor implements NestInterceptor {
+export class SuccessResponseInterceptor implements NestInterceptor {
   intercept(
     context: ExecutionContext,
     next: CallHandler<any>,
@@ -18,6 +18,10 @@ export class UndefinedToNullInterceptor implements NestInterceptor {
 
     return next
       .handle() // 컨트롤러 실행 후
-      .pipe(map((data) => (data === undefined ? null : data)));
+      .pipe(
+        map((data) => {
+          return { success: true, code: 200, data: undefined ? null : data };
+        }),
+      );
   }
 }

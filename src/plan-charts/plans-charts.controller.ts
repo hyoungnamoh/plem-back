@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UserDeco } from 'src/common/decorators/user.decorator';
 import { Users } from 'src/entities/Users';
@@ -21,10 +11,8 @@ export class PlanChartsController {
   // 일정표 생성
   @Post('')
   @UseGuards(JwtAuthGuard)
-  postPlanChart(@Body() body: CreatePlanChartDto, @UserDeco() user: Users) {
-    this.planChartService.postPlanChart(
-      Object.assign(body, { userId: user.id }),
-    );
+  async postPlanChart(@Body() body: CreatePlanChartDto, @UserDeco() user: Users) {
+    await this.planChartService.postPlanChart(Object.assign(body, { userId: user.id }));
   }
 
   // 일정표 가져오기
@@ -35,7 +23,9 @@ export class PlanChartsController {
 
   // 일정표 수정
   @Put('/:id')
-  putPlanChart(@Param() param) {}
+  putPlanChart(@Param() param: { id: number }, @Body() body: { name: string }) {
+    return this.planChartService.putPlanChart({ ...param, ...body });
+  }
 
   // 일정표 삭제
   @Delete('/:id')

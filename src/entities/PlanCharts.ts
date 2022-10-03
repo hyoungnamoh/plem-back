@@ -1,4 +1,4 @@
-import { ArrayNotEmpty, IsArray, IsIn, IsNotEmpty } from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsIn, IsNotEmpty, IsString, Length } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
@@ -22,17 +22,15 @@ export class PlanCharts {
   @Column('int', { name: 'user_id', nullable: true })
   UserId: number | null;
 
+  @IsString({ message: '일정표명은 1~20자로 입력해주세요' })
+  @IsNotEmpty({ message: '일정표명은 1~20자로 입력해주세요' })
+  @Length(1, 20, { message: '일정표명은 1~20자로 입력해주세요' })
   @Column('varchar', { name: 'name', length: 100 })
   name: string;
 
-  // @Column('datetime', {
-  //   name: 'created_at',
-  //   default: () => 'CURRENT_TIMESTAMP',
-  // })
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  // @Column('datetime', { name: 'updated_at', nullable: true })
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date | null;
 

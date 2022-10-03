@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { PlansService } from './plans.service';
 
@@ -16,8 +7,8 @@ export class PlansController {
   constructor(private planService: PlansService) {}
   // 일정 생성
   @Post()
-  postPlan(@Body() body: CreatePlanDto) {
-    this.planService.postPlan(body);
+  async postPlan(@Body() body: CreatePlanDto) {
+    await this.planService.postPlan(body);
   }
 
   // 일정 가져오기
@@ -32,7 +23,9 @@ export class PlansController {
 
   // 일정 삭제
   @Delete('/:id')
-  deletePlan(@Param() param) {}
+  async deletePlan(@Param('id', ParseIntPipe) id: number) {
+    await this.planService.deletePlan({ id });
+  }
 
   // 일정 리스트
   @Get('')
