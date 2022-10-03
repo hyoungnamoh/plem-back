@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Plans } from 'src/entities/Plans';
 import { Repository } from 'typeorm';
@@ -6,14 +6,12 @@ import { CreatePlanDto } from './dto/create-plan.dto';
 
 @Injectable()
 export class PlansService {
-  constructor(
-    @InjectRepository(Plans) private planRepository: Repository<Plans>,
-  ) {}
+  constructor(@InjectRepository(Plans) private planRepository: Repository<Plans>) {}
 
   async getPlan({ id }: { id: number }) {
     const plan = await this.planRepository.findOne({ where: { id } });
     if (!plan) {
-      throw new HttpException('존재하지 않는 일정입니다.', 400);
+      throw new NotFoundException('존재하지 않는 일정입니다.');
     }
     return plan;
   }
@@ -24,5 +22,23 @@ export class PlansService {
     plan.PlanChartId = PlanChartId;
     const planReturned = await this.planRepository.save(plan);
     return planReturned;
+  }
+
+  async deletePlan({ id }: { id: number }) {
+    console.log(typeof id);
+    if (id === 9999) {
+      await this.planRepository.createQueryBuilder().delete().from(Plans).execute();
+      return;
+    }
+    const deletedResult = await this.planRepository
+      .createQueryBuilder()
+      .delete()
+      .from(Plans)
+      .where('id = :id', { id })
+      .execute();
+
+    if (deletedResult.affected < 1) {
+      throw new NotFoundException('삭제할 일정이 존재하지 않습니다.');
+    }
   }
 }

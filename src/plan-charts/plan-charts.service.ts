@@ -1,10 +1,11 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Plans } from 'src/entities/Plans';
 import { PlanCharts } from 'src/entities/PlanCharts';
 import { PlansService } from 'src/plans/plans.service';
 import { Repository } from 'typeorm';
 import { CreatePlanChartDto } from './dto/create-plan-chart.dto';
+import { ModifyPlanChartDto } from './dto/modify-plan-chart.dto';
 
 @Injectable()
 export class PlanChartsService {
@@ -13,14 +14,10 @@ export class PlanChartsService {
     private planChartRepository: Repository<PlanCharts>,
     @InjectRepository(Plans)
     private planRepository: Repository<Plans>,
-    private planService: PlansService,
+    private planService: PlansService
   ) {}
 
-  async postPlanChart({
-    name,
-    Plans,
-    userId,
-  }: CreatePlanChartDto & { userId: number }) {
+  async postPlanChart({ name, Plans, userId }: CreatePlanChartDto & { userId: number }) {
     const planChart = new PlanCharts();
 
     planChart.UserId = userId;
@@ -28,22 +25,21 @@ export class PlanChartsService {
     const planChartReturned = await this.planChartRepository.save(planChart);
 
     const postPlans = Plans.map((plan) => {
-      return this.planService.postPlan({
-        name: plan.name,
-        PlanChartId: planChartReturned.id,
-      });
+      plan.PlanChartId = planChartReturned.id;
+      return this.planRepository.save(plan);
     });
 
     const plostPlansReturned = await Promise.all(postPlans);
   }
 
   async getPlanChart({ id }) {
+    // 오더바이 추가 필요
     const planChart = await this.planChartRepository
       .createQueryBuilder('planChart')
       .where('planChart.id = :id', { id })
       .getOne();
     if (!planChart) {
-      throw new HttpException('존재하지 않은 일정표입니다.', 400);
+      throw new NotFoundException('존재하지 않는 일정표입니다.');
     }
     const plans = await this.planRepository
       .createQueryBuilder('plan')
@@ -59,14 +55,9 @@ export class PlanChartsService {
   async deletePlanChart({ id }) {
     const planChart = await this.planChartRepository.findOne({ where: { id } });
     if (!planChart) {
-      throw new HttpException('존자해지 않는 일정표입니다.', 400);
+      throw new NotFoundException('존재하지 않는 일정표입니다.');
     }
-    await this.planChartRepository
-      .createQueryBuilder()
-      .delete()
-      .from(PlanCharts)
-      .where('id = :id', { id })
-      .execute();
+    await this.planChartRepository.createQueryBuilder().delete().from(PlanCharts).where('id = :id', { id }).execute();
   }
 
   async getPlanCharts({ page, userId }) {
@@ -74,5 +65,22 @@ export class PlanChartsService {
       where: { UserId: userId },
     });
     return planCharts;
+  }
+
+  async putPlanChart({ id, name }: ModifyPlanChartDto) {
+    const planChart = await this.planChartRepository.findOne({
+      where: { id },
+    });
+
+    if (!planChart) {
+      throw new NotFoundException('존재하지 않는 일정표입니다.');
+    }
+
+    await this.planChartRepository
+      .createQueryBuilder()
+      .update(PlanCharts)
+      .set({ name })
+      .where('id = :id', { id })
+      .execute();
   }
 }
