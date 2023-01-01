@@ -14,10 +14,15 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
-    }),
+    })
   );
   app.use(cookieParser());
   app.use(passport.initialize());
+
+  process.on('uncaughtException', (err) => {
+    console.info(err);
+    process.exit(1);
+  });
 
   await app.listen(port);
   console.info(`listening on port ${port}`);

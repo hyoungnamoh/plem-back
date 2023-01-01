@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Post,
-  Put,
-  Req,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Query, Post, Put, Req, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
@@ -26,7 +16,7 @@ export class UsersController {
   constructor(
     private userService: UsersService,
     private authService: AuthService,
-    private emailService: EmailService,
+    private emailService: EmailService
   ) {}
 
   @Post() // 회원가입
@@ -50,10 +40,7 @@ export class UsersController {
 
   @Delete('/delete') // 계정 삭제
   @UseGuards(JwtAuthGuard)
-  async deleteUser(
-    @UserDeco() user: Users,
-    @Body() body: { password: string },
-  ) {
+  async deleteUser(@UserDeco() user: Users, @Body() body: { password: string }) {
     await this.userService.deleteUser({ ...user, ...body });
   }
 
@@ -66,13 +53,18 @@ export class UsersController {
   }
 
   @Post('/verification-code') // 인증번호 전송
-  async postVerificationCode(@Body() body: { to: string }) {
+  async postVerificationCode(@Body() body: { email: string }) {
     return await this.emailService.sendVerificationCode(body);
   }
 
   @Post('/make-nickname')
   async makeNickname(@Body() body: { to: string }) {
     // return await this.emailService.sendVerificationCode(body);
+  }
+
+  @Get('/check-duplicate-email')
+  async checkDuplicateEmail(@Query() query: { email: string }) {
+    return await this.userService.checkDuplicateEmail(query);
   }
 
   // @Post('/logout') // 로그아웃

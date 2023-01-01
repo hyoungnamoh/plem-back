@@ -6,9 +6,10 @@ import { Users } from 'src/entities/Users';
 import { PlansService } from 'src/plans/plans.service';
 import { PlanChartsController } from './plans-charts.controller';
 import { PlanChartsService } from './plan-charts.service';
+import { SubPlans } from 'src/entities/SubPlans';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Users, PlanCharts, Plans])],
+  imports: [TypeOrmModule.forFeature([Users, PlanCharts, Plans, SubPlans])],
   controllers: [PlanChartsController],
   providers: [PlanChartsService, PlansService],
 })

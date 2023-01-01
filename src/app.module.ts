@@ -22,6 +22,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import * as path from 'path';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { EmailModule } from './email/email.module';
+import { SubPlans } from './entities/SubPlans';
 
 @Module({
   imports: [
@@ -29,7 +30,7 @@ import { EmailModule } from './email/email.module';
     PlansModule,
     UsersModule,
     TypeOrmModule.forRoot(ormconfig),
-    TypeOrmModule.forFeature([Users, Plans, PlanCharts]),
+    TypeOrmModule.forFeature([Users, Plans, PlanCharts, SubPlans]),
     AuthModule,
     PlanChartsModule,
     MailerModule.forRootAsync({
@@ -51,19 +52,8 @@ import { EmailModule } from './email/email.module';
     }),
     EmailModule,
   ],
-  controllers: [
-    AppController,
-    PlansController,
-    UsersController,
-    PlanChartsController,
-  ],
-  providers: [
-    AppService,
-    ConfigService,
-    PlansService,
-    UsersService,
-    PlanChartsService,
-  ],
+  controllers: [AppController, PlansController, UsersController, PlanChartsController],
+  providers: [AppService, ConfigService, PlansService, UsersService, PlanChartsService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {}

@@ -1,4 +1,4 @@
-import { HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from 'src/entities/Users';
 import { Repository } from 'typeorm';
@@ -13,10 +13,7 @@ export class UsersService {
     private userRepository: Repository<Users>
   ) {}
 
-  async signUp({ email, password, checkPassword }: SignUpRequestDto) {
-    if (password !== checkPassword) {
-      throw new HttpException('비밀번호가 일치하지 않습니다!', 400);
-    }
+  async signUp({ email, password, nickname }: SignUpRequestDto) {
     const user = await this.userRepository.findOne({
       where: { email },
       withDeleted: true,
@@ -29,7 +26,10 @@ export class UsersService {
     await this.userRepository.save({
       email,
       password: hashedPassword,
+      nickname,
     });
+
+    return true;
   }
 
   async putUser({ email }: Users, { password, nickname, newPassword }: ChangeMyInfoRequestDto) {
@@ -66,5 +66,14 @@ export class UsersService {
       .from(Users)
       .where('user.email = :email', { email })
       .execute();
+  }
+
+  async checkDuplicateEmail({ email }: { email: string }) {
+    const user = await this.userRepository.createQueryBuilder('user').where('user.email = :email', { email }).getOne();
+
+    if (user && !user.deletedAt) {
+      throw new BadRequestException('이미 사용중인 이메일 입니다.');
+    }
+    return true;
   }
 }

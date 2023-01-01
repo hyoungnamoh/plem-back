@@ -1,4 +1,4 @@
-import { ArrayNotEmpty, IsArray, IsIn, IsNotEmpty, IsString, Length } from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsIn, IsNotEmpty, IsString, Length, ValidateNested } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
@@ -12,6 +12,8 @@ import {
 } from 'typeorm';
 import { Users } from './Users';
 import { Plans } from './Plans';
+import { Type } from 'class-transformer';
+import { OmitType, PickType } from '@nestjs/swagger';
 
 @Index('user_id', ['UserId'], {})
 @Entity('PLAN_CHARTS', { schema: 'plem' })
@@ -37,6 +39,8 @@ export class PlanCharts {
   @IsArray()
   @ArrayNotEmpty()
   @OneToMany(() => Plans, (plan) => plan.PlanChart)
+  @ValidateNested()
+  @Type(() => OmitType(Plans, ['PlanChartId']))
   Plans: Plans[];
 
   @ManyToOne(() => Users, (users) => users.PlanCharts, {

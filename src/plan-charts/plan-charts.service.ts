@@ -1,35 +1,64 @@
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Plans } from 'src/entities/Plans';
+import { Plans as PlansRepo } from 'src/entities/Plans';
 import { PlanCharts } from 'src/entities/PlanCharts';
-import { PlansService } from 'src/plans/plans.service';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CreatePlanChartDto } from './dto/create-plan-chart.dto';
 import { ModifyPlanChartDto } from './dto/modify-plan-chart.dto';
+import { SubPlans } from 'src/entities/SubPlans';
 
 @Injectable()
 export class PlanChartsService {
   constructor(
     @InjectRepository(PlanCharts)
     private planChartRepository: Repository<PlanCharts>,
-    @InjectRepository(Plans)
-    private planRepository: Repository<Plans>,
-    private planService: PlansService
+    @InjectRepository(PlansRepo)
+    private planRepository: Repository<PlansRepo>,
+    @InjectRepository(SubPlans)
+    private subPlanRepository: Repository<SubPlans>,
+    private datasource: DataSource
   ) {}
 
   async postPlanChart({ name, Plans, userId }: CreatePlanChartDto & { userId: number }) {
+    const queryRunner = this.datasource.createQueryRunner();
+    queryRunner.connect();
+    queryRunner.startTransaction();
     const planChart = new PlanCharts();
 
-    planChart.UserId = userId;
-    planChart.name = name;
-    const planChartReturned = await this.planChartRepository.save(planChart);
+    try {
+      planChart.UserId = userId;
+      planChart.name = name;
 
-    const postPlans = Plans.map((plan) => {
-      plan.PlanChartId = planChartReturned.id;
-      return this.planRepository.save(plan);
-    });
+      const planChartReturned = await queryRunner.manager.getRepository(PlanCharts).save(planChart);
 
-    const plostPlansReturned = await Promise.all(postPlans);
+      const planPromiseArray = Plans.map((plan) => {
+        plan.PlanChartId = planChartReturned.id;
+        return queryRunner.manager.getRepository(PlansRepo).save(plan);
+      });
+      const plansReturned = await Promise.all(planPromiseArray);
+
+      const subPlanPromiseArray = plansReturned.map((plan) => {
+        return plan.SubPlans.map((subPlan) => {
+          subPlan.PlanId = plan.id;
+
+          return queryRunner.manager.getRepository(SubPlans).save(subPlan);
+        });
+      });
+
+      for (let i = 0; i < subPlanPromiseArray.length; i++) {
+        const subPlanPromise = subPlanPromiseArray[i];
+        await Promise.all(subPlanPromise);
+      }
+
+      await queryRunner.commitTransaction();
+
+      return;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async getPlanChart({ id }) {
@@ -45,6 +74,7 @@ export class PlanChartsService {
       .createQueryBuilder('plan')
       .where('plan.PlanChartId = :id', { id })
       .getMany();
+
     Object.assign(planChart, { plans });
 
     return {

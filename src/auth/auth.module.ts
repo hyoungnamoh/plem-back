@@ -15,7 +15,7 @@ import { LocalStrategy } from './local.strategy';
     PassportModule.register({ session: false }),
     JwtModule.register({
       secret: process.env.SECRET,
-      signOptions: { expiresIn: '1h' },
+      signOptions: { expiresIn: '9999h' },
     }),
     TypeOrmModule.forFeature([Users]),
   ],

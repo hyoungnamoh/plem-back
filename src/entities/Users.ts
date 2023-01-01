@@ -17,7 +17,7 @@ export class Users {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' }) // name: db 컬럼명
   id: number; // js단에서 사용할 변수명
 
-  @IsEmail(null, { message: '이메일 형식을 확인해주세요.' })
+  @IsEmail({}, { message: '이메일 형식을 확인해주세요.' })
   @IsNotEmpty({ message: '이메일 형식을 확인해주세요.' })
   @Column('varchar', { name: 'email', unique: true, length: 320 })
   email: string;
@@ -25,7 +25,7 @@ export class Users {
   @IsString({ message: '닉네임은 한글 또는 영문 2~12자로 입력해주세요.' })
   @IsNotEmpty({ message: '닉네임은 한글 또는 영문 2~12자로 입력해주세요.' })
   @Length(2, 12, { message: '닉네임은 한글 또는 영문 2~12자로 입력해주세요.' })
-  @Column('varchar', { name: 'nickname', length: 100, nullable: true })
+  @Column('varchar', { name: 'nickname', length: 100, nullable: false })
   nickname: string;
 
   @Column('varchar', { name: 'password', length: 100, select: false })

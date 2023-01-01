@@ -1,3 +1,4 @@
+import { IsNotEmpty, IsNumber, IsString, Length } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
@@ -16,10 +17,15 @@ export class SubPlans {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;
 
-  @Column('int', { name: 'plan_id', nullable: true })
-  PlanId: number | null;
+  @Column('int', { name: 'plan_id', nullable: false })
+  @IsNumber(undefined, { each: true })
+  @IsNotEmpty()
+  PlanId: number;
 
-  @Column('varchar', { name: 'name', length: 100 })
+  @IsString()
+  @IsNotEmpty()
+  @Length(1, 30, { message: '하위 일정명을 적어주세요' })
+  @Column('varchar', { name: 'name', length: 100, nullable: false })
   name: string;
 
   // @Column('datetime', {

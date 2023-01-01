@@ -1,18 +1,32 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Catch,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UserDeco } from 'src/common/decorators/user.decorator';
+import { SuccessResponseInterceptor } from 'src/common/interceptors/successResponse.interceptor';
 import { Users } from 'src/entities/Users';
 import { CreatePlanChartDto } from './dto/create-plan-chart.dto';
 import { PlanChartsService } from './plan-charts.service';
 
 @Controller('plan-charts')
+@UseInterceptors(SuccessResponseInterceptor)
 export class PlanChartsController {
   constructor(private planChartService: PlanChartsService) {}
   // 일정표 생성
   @Post('')
   @UseGuards(JwtAuthGuard)
   async postPlanChart(@Body() body: CreatePlanChartDto, @UserDeco() user: Users) {
-    await this.planChartService.postPlanChart(Object.assign(body, { userId: user.id }));
+    return await this.planChartService.postPlanChart(Object.assign(body, { userId: user.id }));
   }
 
   // 일정표 가져오기
