@@ -1,9 +1,11 @@
 import { OmitType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { ArrayNotEmpty, IsArray, IsNotEmpty, IsNumber, IsString, Length, ValidateNested } from 'class-validator';
+import { IsArray, IsIn, IsNotEmpty, IsNumber, IsString, Length, ValidateNested } from 'class-validator';
+import { invalidErrorMessage } from 'src/common/helper/invalidErrorMessage';
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   Index,
   JoinColumn,
@@ -28,9 +30,13 @@ export class Plans {
 
   @IsString()
   @IsNotEmpty()
-  @Length(1, 30, { message: '일정명을 적어주세요' })
+  @Length(1, 30, { message: '일정명을 적어주세요.' })
   @Column('varchar', { name: 'name', length: 100 })
   name: string;
+
+  @IsIn([null, 0, 1, 2, 3, 4, 5, 6, 7], { message: (validationArguments) => invalidErrorMessage(validationArguments) })
+  @Column('varchar', { name: 'notification', length: 100 })
+  notification: number | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
@@ -39,7 +45,10 @@ export class Plans {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date | null;
 
-  @ManyToOne(() => PlanCharts, (planCharts) => planCharts.Plans, {
+  @DeleteDateColumn({ name: 'removed_at' })
+  removedAt: Date | null;
+
+  @ManyToOne(() => PlanCharts, (planCharts) => planCharts.plans, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
@@ -47,9 +56,8 @@ export class Plans {
   PlanChart: PlanCharts;
 
   @IsArray()
-  @ArrayNotEmpty()
-  @OneToMany(() => SubPlans, (subPlans) => subPlans.Plan)
+  @OneToMany(() => SubPlans, (subPlans) => subPlans.plan)
   @ValidateNested()
   @Type(() => OmitType(SubPlans, ['PlanId']))
-  SubPlans: SubPlans[];
+  subPlans: SubPlans[];
 }

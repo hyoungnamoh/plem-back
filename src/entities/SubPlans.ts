@@ -2,6 +2,7 @@ import { IsNotEmpty, IsNumber, IsString, Length } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   Index,
   JoinColumn,
@@ -39,10 +40,13 @@ export class SubPlans {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date | null;
 
-  @ManyToOne(() => Plans, (plans) => plans.SubPlans, {
+  @DeleteDateColumn({ name: 'removed_at' })
+  removedAt: Date | null;
+
+  @ManyToOne(() => Plans, (plans) => plans.subPlans, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
   @JoinColumn([{ name: 'plan_id', referencedColumnName: 'id' }])
-  Plan: Plans;
+  plan: Plans;
 }
