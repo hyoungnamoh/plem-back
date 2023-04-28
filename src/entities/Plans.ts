@@ -38,6 +38,22 @@ export class Plans {
   @Column('varchar', { name: 'notification', length: 100 })
   notification: number | null;
 
+  @IsNumber({}, { message: (validationArguments) => invalidErrorMessage(validationArguments) })
+  @Column('int', { name: 'start_hour' })
+  startHour: number;
+
+  @IsNumber({}, { message: (validationArguments) => invalidErrorMessage(validationArguments) })
+  @Column('int', { name: 'start_min' })
+  startMin: number;
+
+  @IsNumber({}, { message: (validationArguments) => invalidErrorMessage(validationArguments) })
+  @Column('int', { name: 'end_hour' })
+  endHour: number;
+
+  @IsNumber({}, { message: (validationArguments) => invalidErrorMessage(validationArguments) })
+  @Column('int', { name: 'end_min' })
+  endMin: number;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

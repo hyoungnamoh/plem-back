@@ -127,8 +127,8 @@ export class PlanChartsService {
       .createQueryBuilder('chart')
       .where('chart.UserId = :userId and chart.removed_at is null', { userId, removedAt: null })
       .getMany();
-    console.log(planCharts);
     const chartWithPlans = planCharts.map(async (chart) => {
+      chart.repeatDays = JSON.parse(chart.repeatDays);
       const plans = await this.planRepository
         .createQueryBuilder('plan')
         .where('plan.PlanChartId = :id and plan.removed_at is null', { id: chart.id })
