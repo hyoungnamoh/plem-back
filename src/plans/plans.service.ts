@@ -37,19 +37,18 @@ export class PlansService {
   }
 
   async deletePlan({ id }: { id: number }) {
-    console.log(typeof id);
     if (id === 9999) {
-      await this.planRepository.createQueryBuilder().delete().from(Plans).execute();
+      await this.planRepository.createQueryBuilder().softDelete().from(Plans).execute();
       return;
     }
     const deletedResult = await this.planRepository
       .createQueryBuilder()
-      .delete()
+      .softDelete()
       .from(Plans)
       .where('id = :id', { id })
       .execute();
 
-    if (deletedResult.affected < 1) {
+    if (deletedResult.affected && deletedResult.affected < 1) {
       throw new NotFoundException('삭제할 일정이 존재하지 않습니다.');
     }
   }

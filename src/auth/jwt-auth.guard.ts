@@ -26,7 +26,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       const verify = this.jwtService.verify(token, { secret: secretKey });
 
       return verify;
-    } catch (e) {
+    } catch (e: any) {
       console.info('validateToken', e);
       switch (e.message) {
         // 토큰에 대한 오류를 판단합니다.

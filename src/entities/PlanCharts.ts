@@ -54,12 +54,12 @@ export class PlanCharts {
 
   @IsNumber()
   @Column('int', { name: 'order_num' })
-  order_num: number;
+  orderNum: number;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ nullable: true, default: null })
   updatedAt: Date | null;
 
   @DeleteDateColumn({ name: 'removed_at' })

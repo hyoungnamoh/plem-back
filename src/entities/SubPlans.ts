@@ -33,11 +33,10 @@ export class SubPlans {
   //   name: 'created_at',
   //   default: () => 'CURRENT_TIMESTAMP',
   // })
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt: Date;
 
-  // @Column('datetime', { name: 'updated_at', nullable: true })
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ nullable: true, default: null })
   updatedAt: Date | null;
 
   @DeleteDateColumn({ name: 'removed_at' })

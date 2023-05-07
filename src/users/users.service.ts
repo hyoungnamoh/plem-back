@@ -37,6 +37,11 @@ export class UsersService {
       where: { email },
       select: ['password'],
     });
+
+    if (!user) {
+      throw new UnauthorizedException('존재하지 않는 유저입니다.');
+    }
+
     const result = await bcrypt.compare(password, user.password);
 
     if (result) {
@@ -71,7 +76,7 @@ export class UsersService {
   async checkDuplicateEmail({ email }: { email: string }) {
     const user = await this.userRepository.createQueryBuilder('user').where('user.email = :email', { email }).getOne();
 
-    if (user && !user.deletedAt) {
+    if (user && !user.removedAt) {
       throw new BadRequestException('이미 사용중인 이메일 입니다.');
     }
     return true;

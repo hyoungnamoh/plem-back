@@ -1,11 +1,13 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Users } from './Users';
 import { Plans } from './Plans';
@@ -22,13 +24,10 @@ export class PlanCharts {
   @Column('varchar', { name: 'name', length: 100 })
   name: string;
 
-  @Column('datetime', {
-    name: 'created_at',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @Column('datetime', { name: 'updated_at', nullable: true })
+  @UpdateDateColumn()
   updatedAt: Date | null;
 
   @ManyToOne(() => Users, (users) => users.planCharts, {

@@ -51,16 +51,14 @@ export class Users {
   //   name: 'created_at',
   //   default: () => 'CURRENT_TIMESTAMP',
   // })
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt: Date;
 
-  // @Column('datetime', { name: 'updated_at', nullable: true })
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt: Date | null;
 
-  // @Column('datetime', { name: 'deleted_at', nullable: true })
-  @DeleteDateColumn({ name: 'deleted_at' })
-  deletedAt: Date | null;
+  @DeleteDateColumn({ name: 'removed_at' })
+  removedAt: Date | null;
 
   @OneToMany(() => PlanCharts, (planChart) => planChart.User)
   PlanCharts: PlanCharts;

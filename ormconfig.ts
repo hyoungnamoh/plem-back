@@ -20,6 +20,7 @@ const ormconfig: TypeOrmModuleOptions = {
   charset: 'utf8mb4',
   logging: process.env.NODE_ENV !== 'production',
   keepConnectionAlive: true,
+  // synchronize: true,
 };
 
 export = ormconfig;

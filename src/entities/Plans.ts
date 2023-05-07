@@ -35,7 +35,7 @@ export class Plans {
   name: string;
 
   @IsIn([null, 0, 1, 2, 3, 4, 5, 6, 7], { message: (validationArguments) => invalidErrorMessage(validationArguments) })
-  @Column('varchar', { name: 'notification', length: 100 })
+  @Column('varchar', { name: 'notification', length: 100, nullable: true })
   notification: number | null;
 
   @IsNumber({}, { message: (validationArguments) => invalidErrorMessage(validationArguments) })
@@ -54,11 +54,10 @@ export class Plans {
   @Column('int', { name: 'end_min' })
   endMin: number;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt: Date;
 
-  // @Column('datetime', { name: 'updated_at', nullable: true })
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ nullable: true, default: null })
   updatedAt: Date | null;
 
   @DeleteDateColumn({ name: 'removed_at' })
