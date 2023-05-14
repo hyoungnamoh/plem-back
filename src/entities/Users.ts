@@ -47,10 +47,9 @@ export class Users {
   @Column('tinyint', { name: 'enabled', width: 1, default: () => "'1'" })
   enabled: boolean;
 
-  // @Column('datetime', {
-  //   name: 'created_at',
-  //   default: () => 'CURRENT_TIMESTAMP',
-  // })
+  @Column('varchar', { name: 'refresh_token', length: 400, select: false, default: () => null, nullable: true })
+  refreshToken: string | null;
+
   @CreateDateColumn()
   createdAt: Date;
 
