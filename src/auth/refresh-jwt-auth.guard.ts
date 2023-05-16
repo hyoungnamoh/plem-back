@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
-export class JwtAuthGuard extends AuthGuard('jwt') {
+export class RefreshJwtAuthGuard extends AuthGuard('jwt') {
   constructor(private jwtService: JwtService) {
     super();
   }
@@ -22,11 +22,11 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
   validateToken(token: string) {
     try {
-      const verify = this.jwtService.verify(token, { secret: process.env.SECRET });
+      const verify = this.jwtService.verify(token, { secret: process.env.REFRESH_SECRET });
 
       return verify;
     } catch (e: any) {
-      console.info('validateToken', e);
+      console.info('Error: validate refresh token', e);
       switch (e.message) {
         // 토큰에 대한 오류를 판단합니다.
         case 'invalid token':
@@ -36,7 +36,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
           throw new HttpException('유효하지 않은 토큰입니다.', 411);
         case 'EXPIRED_TOKEN':
         case 'jwt expired':
-          throw new HttpException('토큰이 만료되었습니다.', 410);
+          throw new HttpException('토큰이 만료되었습니다.', 420);
         default:
           throw new HttpException('토큰 인증 오류입니다.', 411);
       }

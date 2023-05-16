@@ -1,8 +1,10 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UseInterceptors } from '@nestjs/common';
+import { SuccessResponseInterceptor } from 'src/common/interceptors/successResponse.interceptor';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { PlansService } from './plans.service';
 
 @Controller('/plans')
+@UseInterceptors(SuccessResponseInterceptor)
 export class PlansController {
   constructor(private planService: PlansService) {}
   // 일정 생성

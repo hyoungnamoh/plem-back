@@ -8,6 +8,7 @@ import { ModifyPlanChartDto } from './dto/modify-plan-chart.dto';
 import { SubPlans } from 'src/entities/SubPlans';
 import { PlansService } from 'src/plans/plans.service';
 import { UpdatePlanChartOrdersDto } from './dto/update-plan-chart-orders.dto';
+import { Users } from 'src/entities/Users';
 
 @Injectable()
 export class PlanChartsService {
@@ -81,11 +82,14 @@ export class PlanChartsService {
     }
   }
 
-  async getPlanChart({ id }) {
+  async getPlanChart({ id }, user: Users) {
     // 오더바이 추가 필요
     const planChart = await this.planChartRepository
       .createQueryBuilder('planChart')
-      .where('planChart.id = :id and planChart.removed_at is null', { id })
+      .where('planChart.id = :id and planChart.removed_at is null and planChart.UserId = :userId', {
+        id,
+        userId: user.id,
+      })
       .getOne();
     if (!planChart) {
       throw new NotFoundException('존재하지 않는 일정표입니다.');
@@ -125,7 +129,7 @@ export class PlanChartsService {
     await this.planChartRepository.softDelete(id);
   }
 
-  async getPlanCharts({ page, userId }) {
+  async getPlanCharts({ userId }) {
     const planCharts = await this.planChartRepository
       .createQueryBuilder('chart')
       .where('chart.UserId = :userId and chart.removed_at is null', { userId, removedAt: null })
@@ -151,6 +155,7 @@ export class PlanChartsService {
       Object.assign(chart, { plans: plansWithSubPlans });
       return chart;
     });
+
     return await Promise.all(chartWithPlans);
   }
 
@@ -263,7 +268,8 @@ export class PlanChartsService {
         throw new NotFoundException('순서 변경에 실패했습니다. 다시 시도해주세요.');
       }
       await queryRunner.commitTransaction();
-      // return updateTargets;
+
+      return;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

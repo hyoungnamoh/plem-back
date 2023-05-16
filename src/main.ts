@@ -3,7 +3,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './http-exception.filter';
 import passport from 'passport';
-import cookieParser from 'cookie-parser';
 
 declare const module: any;
 
@@ -16,7 +15,6 @@ async function bootstrap() {
       transform: true,
     })
   );
-  app.use(cookieParser());
   app.use(passport.initialize());
 
   process.on('uncaughtException', (err) => {
