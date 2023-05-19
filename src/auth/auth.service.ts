@@ -11,14 +11,13 @@ export class AuthService {
   constructor(
     private jwtService: JwtService,
     @InjectRepository(Users)
-    private userRepository: Repository<Users>,
-    private readonly configService: ConfigService
+    private userRepository: Repository<Users>
   ) {}
 
   async validateUser(email: string, password: string) {
     const user = await this.userRepository.findOne({
       where: { email },
-      select: ['id', 'email', 'nickname', 'password', 'isCertified', 'enabled', 'refreshToken'],
+      select: ['id', 'email', 'nickname', 'password', 'isCertified', 'enabled'],
     });
     if (!user) {
       return null;
@@ -35,6 +34,7 @@ export class AuthService {
   async login(user: Users) {
     const { newAccessToken, newRefreshToken } = await this.getTokens(user);
     await this.updateRefreshToken(user.id, newRefreshToken);
+
     return {
       accessToken: newAccessToken,
       refreshToken: newRefreshToken,
@@ -42,9 +42,13 @@ export class AuthService {
   }
 
   async logout(userId: number) {
-    await this.userRepository.update(userId, {
+    const result = await this.userRepository.update(userId, {
       refreshToken: null,
     });
+    if (result.affected && result.affected < 1) {
+      throw new NotFoundException('존재하지 않는 유저입니다.');
+    }
+    return;
   }
 
   async updateRefreshToken(userId: number, refreshToken: string) {
@@ -96,7 +100,6 @@ export class AuthService {
           nickname: user.nickname,
           isCertified: user.isCertified,
           enabled: user.enabled,
-          refreshToken: user.refreshToken,
         },
         {
           secret: process.env.SECRET,
@@ -110,7 +113,6 @@ export class AuthService {
           nickname: user.nickname,
           isCertified: user.isCertified,
           enabled: user.enabled,
-          // refreshToken: user.refreshToken,
         },
         {
           secret: process.env.REFRESH_SECRET,

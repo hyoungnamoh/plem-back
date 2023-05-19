@@ -11,7 +11,6 @@ import { LocalStrategy } from './local.strategy';
 
 @Module({
   imports: [
-    UsersModule,
     PassportModule.register({ session: false }),
     JwtModule.register({
       secret: process.env.SECRET,

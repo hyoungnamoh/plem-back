@@ -33,8 +33,8 @@ export class PlanChartsController {
   // 일정표 가져오기
   @Get('/:id')
   @UseGuards(JwtAuthGuard)
-  getPlanChart(@Param() param: { id: number }) {
-    return this.planChartService.getPlanChart(param);
+  getPlanChart(@Param() param: { id: number }, @UserDeco() user: Users) {
+    return this.planChartService.getPlanChart(param, user);
   }
 
   // 일정표 수정
@@ -58,7 +58,7 @@ export class PlanChartsController {
     return this.planChartService.getPlanCharts({ ...query, userId: user.id });
   }
 
-  // 일정표 리스트
+  // 일정표 리스트 순서 변경
   @Put('/order/list')
   @UseGuards(JwtAuthGuard)
   updatePlanChartsOrder(@Body() body: { chartOrders: { id: number; order: number }[] }, @UserDeco() user: Users) {
