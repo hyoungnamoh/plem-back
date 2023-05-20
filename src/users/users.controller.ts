@@ -20,13 +20,6 @@ export class UsersController {
     private emailService: EmailService
   ) {}
 
-  // 닉네임 변경
-  @Put('/nickname')
-  @UseGuards(JwtAuthGuard)
-  updatePlanChartsOrder(@Body() body: { nickname: string }, @UserDeco() user: Users) {
-    return this.userService.updateNickname({ ...body, userId: user.id });
-  }
-
   @Post() // 회원가입
   async signUp(@Body() body: SignUpRequestDto) {
     return await this.userService.signUp(body);
@@ -40,11 +33,11 @@ export class UsersController {
     return user;
   }
 
-  @Put() // 내 정보 수정
-  @UseGuards(JwtAuthGuard)
-  async putUser(@UserDeco() user: Users, @Body() body: ChangeMyInfoRequestDto) {
-    await this.userService.putUser(user, body);
-  }
+  // @Put() // 내 정보 수정
+  // @UseGuards(JwtAuthGuard)
+  // async putUser(@UserDeco() user: Users, @Body() body: ChangeMyInfoRequestDto) {
+  //   await this.userService.putUser(user, body);
+  // }
 
   @Delete('/delete') // 계정 삭제
   @UseGuards(JwtAuthGuard)
@@ -91,6 +84,13 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   async logout(@UserDeco() user: Users) {
     return await this.authService.logout(user.id);
+  }
+
+  // 닉네임 변경
+  @Put('/nickname')
+  @UseGuards(JwtAuthGuard)
+  async updateNickname(@Body() body: { nickname: string }, @UserDeco() user: Users) {
+    return await this.userService.updateNickname({ ...body, userId: user.id });
   }
 
   // @Get('/verification-code') // 비밀번호 찾기

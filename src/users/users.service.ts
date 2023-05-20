@@ -1,16 +1,19 @@
 import { BadRequestException, HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from 'src/entities/Users';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { SignUpRequestDto } from './dto/sign-up.request.dto';
 import bcrypt from 'bcrypt';
 import { ChangeMyInfoRequestDto } from './dto/change-my-info.request.dto';
+import { AuthService } from 'src/auth/auth.service';
 @Injectable()
 export class UsersService {
   // service(business logic)는 repo(이어주는 역할)를 통해 entitiy(table)에 쿼리를 날림
   constructor(
     @InjectRepository(Users)
-    private userRepository: Repository<Users>
+    private userRepository: Repository<Users>,
+    private datasource: DataSource,
+    private authService: AuthService
   ) {}
 
   async signUp({ email, password, nickname }: SignUpRequestDto) {
@@ -80,5 +83,49 @@ export class UsersService {
       throw new BadRequestException('이미 사용중인 이메일 입니다.');
     }
     return true;
+  }
+
+  async updateNickname({ nickname, userId }: { nickname: string; userId: number }) {
+    const queryRunner = this.datasource.createQueryRunner();
+    try {
+      queryRunner.connect();
+      queryRunner.startTransaction();
+      const user = await this.userRepository.createQueryBuilder('user').where('id = :userId', { userId }).getOne();
+
+      if (!nickname) {
+        throw new BadRequestException('닉네임을 입력해주세요.');
+      }
+
+      if (!user || user.removedAt) {
+        throw new BadRequestException('계정을 찾을 수가 없습니다.');
+      }
+
+      if (user.nickname === nickname) {
+        throw new BadRequestException('기존 닉네임과 동일합니다.');
+      }
+      const newNicknameUser = { ...user, nickname };
+
+      const { newAccessToken, newRefreshToken } = await this.authService.getTokens(newNicknameUser);
+
+      await queryRunner.manager
+        .getRepository(Users)
+        .createQueryBuilder('user')
+        .update(Users)
+        .set({ nickname, refreshToken: newRefreshToken })
+        .where('id = :userId', { userId })
+        .execute();
+
+      await queryRunner.commitTransaction();
+
+      return {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 }

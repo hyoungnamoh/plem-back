@@ -58,18 +58,16 @@ export class PlanChartsService {
       });
       const plansReturned = await Promise.all(planPromiseArray);
 
-      const subPlanPromiseArray = plansReturned.map((plan) => {
-        return plan.subPlans.map((subPlan) => {
-          subPlan.PlanId = plan.id;
-
-          return queryRunner.manager.getRepository(SubPlans).save(subPlan);
-        });
-      });
-
-      for (let i = 0; i < subPlanPromiseArray.length; i++) {
-        const subPlanPromise = subPlanPromiseArray[i];
-        await Promise.all(subPlanPromise);
-      }
+      await Promise.all(
+        plansReturned.map(async (plan) => {
+          return await Promise.all(
+            plan.subPlans.map((subPlan) => {
+              subPlan.PlanId = plan.id;
+              return queryRunner.manager.getRepository(SubPlans).save(subPlan);
+            })
+          );
+        })
+      );
 
       await queryRunner.commitTransaction();
 
@@ -171,41 +169,36 @@ export class PlanChartsService {
       if (!planChart) {
         throw new NotFoundException('존재하지 않는 일정표입니다.');
       }
+
       const originPlans = await queryRunner.manager
         .getRepository(Plans)
         .createQueryBuilder()
         .where('plan_chart_id = :chartId and removed_at is null', { chartId: planChart.id })
         .getMany();
 
-      const originPlanIds = originPlans.filter((plan) => plan.id).map((plan) => plan.id);
-      const newPlanIds = plans.filter((plan) => plan.id).map((plan) => plan.id);
-      const deletedPlanIds = originPlanIds.filter((id) => !newPlanIds.includes(id));
-      const addedPlans = plans.filter((plan) => !plan.id);
+      await Promise.all(originPlans.map((plan) => this.plansService.deletePlan({ id: plan.id })));
 
-      if (!planChart) {
-        throw new NotFoundException('존재하지 않는 일정표입니다.');
-      }
-
-      // 수정 과정에서 삭제된 계획 삭제
-      if (deletedPlanIds.length > 0) {
-        deletedPlanIds.map(async (deletedId) => {
-          await queryRunner.manager
-            .getRepository(Plans)
-            .createQueryBuilder()
-            .softDelete()
-            .from(Plans)
-            .where('id = :deletedId', { deletedId })
-            .execute();
-        });
-      }
-
-      // 수정 과정에서 추가된 계획 추가
-      if (addedPlans.length > 0) {
-        addedPlans.map(async (plan) => {
+      const newPlans = await Promise.all(
+        plans.map(async (plan) => {
           plan.PlanChartId = planChart.id;
-          await queryRunner.manager.getRepository(Plans).save(plan);
-        });
-      }
+          const { id, ...planWithoutId } = plan;
+
+          return queryRunner.manager.getRepository(PlansRepo).save(planWithoutId);
+        })
+      );
+
+      await Promise.all(
+        newPlans.map(async (plan) => {
+          return await Promise.all(
+            plan.subPlans.map((subPlan) => {
+              subPlan.PlanId = plan.id;
+              const { id, ...subPlanWithoutId } = subPlan;
+
+              return queryRunner.manager.getRepository(SubPlans).save(subPlanWithoutId);
+            })
+          );
+        })
+      );
 
       // 선택일 반복일 경우
       if (repeats.includes(7) && repeatDays.length === 0) {
@@ -216,7 +209,6 @@ export class PlanChartsService {
       planChart.repeats = JSON.stringify(repeats);
       planChart.repeatDays = JSON.stringify(repeatDays);
 
-      // const planChartReturned = await queryRunner.manager.getRepository(PlanCharts).save(planChart);
       await queryRunner.manager
         .getRepository(PlanCharts)
         .createQueryBuilder()
