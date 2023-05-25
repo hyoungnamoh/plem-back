@@ -23,6 +23,7 @@ import * as path from 'path';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { EmailModule } from './email/email.module';
 import { SubPlans } from './entities/SubPlans';
+import { SubPlansService } from './sub-plans/sub-plans.service';
 
 @Module({
   imports: [
@@ -53,7 +54,7 @@ import { SubPlans } from './entities/SubPlans';
     EmailModule,
   ],
   controllers: [AppController, PlansController, UsersController, PlanChartsController],
-  providers: [AppService, ConfigService, PlansService, UsersService, PlanChartsService],
+  providers: [AppService, ConfigService, PlansService, UsersService, PlanChartsService, SubPlansService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {}

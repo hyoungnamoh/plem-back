@@ -38,12 +38,12 @@ export class PlansService {
 
   async deletePlan({ id }: { id: number }) {
     if (id === 9999) {
-      await this.planRepository.createQueryBuilder().softDelete().from(Plans).execute();
+      await this.planRepository.createQueryBuilder().delete().from(Plans).execute();
       return;
     }
     const deletedResult = await this.planRepository
       .createQueryBuilder()
-      .softDelete()
+      .delete()
       .from(Plans)
       .where('id = :id', { id })
       .execute();
