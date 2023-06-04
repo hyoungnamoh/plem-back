@@ -80,7 +80,7 @@ export class PlanChartsService {
     }
   }
 
-  async getPlanChart({ id }, user: Users) {
+  async getPlanChart({ id }: { id: number }, user: Users) {
     // 오더바이 추가 필요
     const planChart = await this.planChartRepository
       .createQueryBuilder('planChart')
@@ -94,7 +94,7 @@ export class PlanChartsService {
     }
     const plans = await this.planRepository
       .createQueryBuilder('plan')
-      .where('plan.PlanChartId = :id and plan.removed_at is null', { id })
+      .where('plan.PlanChartId = :id', { id })
       .getMany();
 
     const plansWithSubPlansPromise = plans.map(async (plan) => {
@@ -109,9 +109,7 @@ export class PlanChartsService {
 
     const chartWithPlans = Object.assign(planChart, { plans: plansWithSubPlans });
 
-    return {
-      ...chartWithPlans,
-    };
+    return chartWithPlans;
   }
 
   async deletePlanChart({ id }) {
@@ -124,13 +122,13 @@ export class PlanChartsService {
       throw new NotFoundException('존재하지 않는 일정표입니다.');
     }
 
-    await this.planChartRepository.softDelete(id);
+    await this.planChartRepository.delete(id);
   }
 
   async getPlanCharts({ userId }) {
     const planCharts = await this.planChartRepository
       .createQueryBuilder('chart')
-      .where('chart.UserId = :userId and chart.removed_at is null', { userId, removedAt: null })
+      .where('chart.UserId = :userId and chart.removed_at is null', { userId })
       .orderBy('chart.order_num', 'ASC')
       .getMany();
 
@@ -181,7 +179,7 @@ export class PlanChartsService {
       const newPlans = await Promise.all(
         plans.map(async (plan) => {
           plan.PlanChartId = planChart.id;
-          const { id, ...planWithoutId } = plan;
+          const { id, updatedAt, removedAt, ...planWithoutId } = plan;
 
           return queryRunner.manager.getRepository(PlansRepo).save(planWithoutId);
         })
@@ -192,7 +190,7 @@ export class PlanChartsService {
           return await Promise.all(
             plan.subPlans.map((subPlan) => {
               subPlan.PlanId = plan.id;
-              const { id, ...subPlanWithoutId } = subPlan;
+              const { id, updatedAt, removedAt, ...subPlanWithoutId } = subPlan;
 
               return queryRunner.manager.getRepository(SubPlans).save(subPlanWithoutId);
             })
@@ -218,7 +216,6 @@ export class PlanChartsService {
         .execute();
 
       await queryRunner.commitTransaction();
-
       // return planChartReturned;
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -262,6 +259,53 @@ export class PlanChartsService {
       await queryRunner.commitTransaction();
 
       return;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async clonePlanChart(body: { id: number }, user: Users) {
+    const queryRunner = this.datasource.createQueryRunner();
+    queryRunner.connect();
+    queryRunner.startTransaction();
+
+    try {
+      const targetPlanChart = await this.getPlanChart(body, user);
+      if (!targetPlanChart) {
+        throw new NotFoundException('존재하지 않는 일정표입니다.');
+      }
+      const copiedPlans = await Promise.all(
+        targetPlanChart.plans.map((plan) => {
+          plan.PlanChartId = targetPlanChart.id;
+          const { id, updatedAt, removedAt, ...planWithoutId } = plan;
+
+          return queryRunner.manager.getRepository(PlansRepo).save(planWithoutId);
+        })
+      );
+
+      await Promise.all(
+        copiedPlans.map(async (plan) => {
+          return await Promise.all(
+            plan.subPlans.map((subPlan) => {
+              subPlan.PlanId = plan.id;
+              const { id, updatedAt, removedAt, ...subPlanWithoutId } = subPlan;
+
+              return queryRunner.manager.getRepository(SubPlans).save(subPlanWithoutId);
+            })
+          );
+        })
+      );
+
+      targetPlanChart.name = targetPlanChart.name + ' Copy';
+      const { id, removedAt, updatedAt, ...copiedPlanChart } = targetPlanChart;
+      const planChartReturned = await queryRunner.manager.getRepository(PlanCharts).save(copiedPlanChart);
+
+      await queryRunner.commitTransaction();
+
+      return planChartReturned;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

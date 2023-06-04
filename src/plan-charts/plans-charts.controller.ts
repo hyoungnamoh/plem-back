@@ -47,8 +47,8 @@ export class PlanChartsController {
   // 일정표 삭제
   @Delete('/:id')
   @UseGuards(JwtAuthGuard)
-  async deletePlanChart(@Body() body: { id: number }) {
-    await this.planChartService.deletePlanChart(body);
+  async deletePlanChart(@Param() param: { id: number }) {
+    return await this.planChartService.deletePlanChart({ id: param.id });
   }
 
   // 일정표 리스트
@@ -63,5 +63,12 @@ export class PlanChartsController {
   @UseGuards(JwtAuthGuard)
   updatePlanChartsOrder(@Body() body: { chartOrders: { id: number; order: number }[] }, @UserDeco() user: Users) {
     return this.planChartService.updatePlanChartsOrder({ ...body, userId: user.id });
+  }
+
+  // 일정표 복사
+  @Post('/clone')
+  @UseGuards(JwtAuthGuard)
+  async clonePlanChart(@Body() body: { id: number }, @UserDeco() user: Users) {
+    return await this.planChartService.clonePlanChart(body, user);
   }
 }
