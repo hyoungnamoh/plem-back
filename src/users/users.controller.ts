@@ -64,14 +64,8 @@ export class UsersController {
 
   // 인증번호 전송
   @Post('/verification-code')
-  async postVerificationCode(@Body() body: { email: string }) {
+  async postVerificationCode(@Body() body: { email: string; isReset?: boolean }) {
     return await this.emailService.sendVerificationCode(body);
-  }
-
-  // 닉네임 랜덤 생성
-  @Post('/make-nickname')
-  async makeNickname(@Body() body: { to: string }) {
-    // return await this.emailService.sendVerificationCode(body);
   }
 
   // 이메일 중복 체크
@@ -93,8 +87,11 @@ export class UsersController {
     return await this.userService.updateNickname({ ...body, userId: user.id });
   }
 
-  // @Get('/verification-code') // 비밀번호 찾기
-  // findPassword() {}
+  // 비밀번호 변경
+  @Put('/password')
+  async updatePassword(@Body() body: { email: string; password: string }) {
+    return await this.userService.updatePassword(body);
+  }
 
   // @Get('/verification-code/verify') // 인증번호 체크
   // checkVerifyCode() {}

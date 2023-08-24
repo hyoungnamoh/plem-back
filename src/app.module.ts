@@ -38,7 +38,6 @@ import { SubPlansService } from './sub-plans/sub-plans.service';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        console.log(config.get('email'));
         return {
           ...config.get('email'),
           template: {
