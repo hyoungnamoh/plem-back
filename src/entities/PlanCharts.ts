@@ -48,7 +48,6 @@ export class PlanCharts {
   @Column('varchar', { name: 'repeats', length: 100 })
   repeats: string;
 
-  @IsArray()
   @Column('varchar', { name: 'repeatDays', length: 200 })
   repeatDays: string;
 

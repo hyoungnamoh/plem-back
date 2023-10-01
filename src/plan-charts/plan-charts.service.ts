@@ -28,7 +28,6 @@ export class PlanChartsService {
     queryRunner.connect();
     queryRunner.startTransaction();
     const planChart = new PlanCharts();
-
     try {
       // 선택일 반복일 경우
       if (repeats.includes(7) && repeatDays.length === 0) {
@@ -277,6 +276,7 @@ export class PlanChartsService {
       if (!targetPlanChart) {
         throw new NotFoundException('존재하지 않는 일정표입니다.');
       }
+
       const copiedPlans = await Promise.all(
         targetPlanChart.plans.map((plan) => {
           plan.PlanChartId = targetPlanChart.id;
@@ -302,9 +302,10 @@ export class PlanChartsService {
       targetPlanChart.name = targetPlanChart.name + ' Copy';
       const { id, removedAt, updatedAt, ...copiedPlanChart } = targetPlanChart;
       const planChartReturned = await queryRunner.manager.getRepository(PlanCharts).save(copiedPlanChart);
+      planChartReturned.repeatDays = JSON.parse(planChartReturned.repeatDays);
+      planChartReturned.repeats = JSON.parse(planChartReturned.repeats);
 
       await queryRunner.commitTransaction();
-
       return planChartReturned;
     } catch (error) {
       await queryRunner.rollbackTransaction();

@@ -34,23 +34,23 @@ export class Plans {
   @Column('varchar', { name: 'name', length: 100 })
   name: string;
 
-  @IsIn([null, 0, 1, 2, 3, 4, 5, 6, 7], { message: (validationArguments) => invalidErrorMessage(validationArguments) })
+  @IsIn([null, '0', '5', '10', '15', '30', '60'], { message: invalidErrorMessage })
   @Column('varchar', { name: 'notification', length: 100, nullable: true })
   notification: number | null;
 
-  @IsNumber({}, { message: (validationArguments) => invalidErrorMessage(validationArguments) })
+  @IsNumber({}, { message: invalidErrorMessage })
   @Column('int', { name: 'start_hour' })
   startHour: number;
 
-  @IsNumber({}, { message: (validationArguments) => invalidErrorMessage(validationArguments) })
+  @IsNumber({}, { message: invalidErrorMessage })
   @Column('int', { name: 'start_min' })
   startMin: number;
 
-  @IsNumber({}, { message: (validationArguments) => invalidErrorMessage(validationArguments) })
+  @IsNumber({}, { message: invalidErrorMessage })
   @Column('int', { name: 'end_hour' })
   endHour: number;
 
-  @IsNumber({}, { message: (validationArguments) => invalidErrorMessage(validationArguments) })
+  @IsNumber({}, { message: invalidErrorMessage })
   @Column('int', { name: 'end_min' })
   endMin: number;
 
