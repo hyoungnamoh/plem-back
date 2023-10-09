@@ -24,6 +24,9 @@ import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { EmailModule } from './email/email.module';
 import { SubPlans } from './entities/SubPlans';
 import { SubPlansService } from './sub-plans/sub-plans.service';
+import { SchedulesController } from './schedules/schedules.controller';
+import { SchedulesService } from './schedules/schedules.service';
+import { SchedulesModule } from './schedules/schedules.module';
 
 @Module({
   imports: [
@@ -51,9 +54,10 @@ import { SubPlansService } from './sub-plans/sub-plans.service';
       },
     }),
     EmailModule,
+    SchedulesModule,
   ],
-  controllers: [AppController, PlansController, UsersController, PlanChartsController],
-  providers: [AppService, ConfigService, PlansService, UsersService, PlanChartsService, SubPlansService],
+  controllers: [AppController, PlansController, UsersController, PlanChartsController, SchedulesController],
+  providers: [AppService, ConfigService, PlansService, UsersService, PlanChartsService, SubPlansService, SchedulesService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {}
