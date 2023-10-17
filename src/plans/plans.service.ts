@@ -15,7 +15,7 @@ export class PlansService {
   async getPlan({ id }: { id: number }) {
     const plan = await this.planRepository.findOne({ where: { id } });
     if (!plan) {
-      throw new NotFoundException('존재하지 않는 일정입니다.');
+      throw new NotFoundException('존재하지 않는 계획입니다.');
     }
 
     const subPlans = await this.subPlanRepository
@@ -49,7 +49,7 @@ export class PlansService {
       .execute();
 
     if (deletedResult.affected && deletedResult.affected < 1) {
-      throw new NotFoundException('삭제할 일정이 존재하지 않습니다.');
+      throw new NotFoundException('삭제할 계획이 존재하지 않습니다.');
     }
   }
 }

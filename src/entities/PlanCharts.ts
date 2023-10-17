@@ -36,20 +36,22 @@ export class PlanCharts {
   @Column('int', { name: 'user_id' })
   UserId: number;
 
-  @IsString({ message: '일정표명은 1~20자로 입력해주세요' })
-  @IsNotEmpty({ message: '일정표명은 1~20자로 입력해주세요' })
-  @Length(1, 20, { message: '일정표명은 1~20자로 입력해주세요' })
+  @IsString({ message: '계획표명은 1~20자로 입력해주세요' })
+  @IsNotEmpty({ message: '계획표명은 1~20자로 입력해주세요' })
+  @Length(1, 20, { message: '계획표명은 1~20자로 입력해주세요' })
   @Column('varchar', { name: 'name', length: 100 })
   name: string;
 
+  // 안함 | 일 | 월 | 화 | 수 | 목 | 금 | 토 | 날짜 지정
   @IsNotEmpty({ message: '반복 값이 없습니다.' })
   @IsArray()
   @ArrayNotEmpty({ message: '반복 값이 없습니다.' })
   @Column('varchar', { name: 'repeats', length: 100 })
   repeats: string;
 
-  @Column('varchar', { name: 'repeatDays', length: 200 })
-  repeatDays: string;
+  // 특정일 반복 ex) [1, 3, 12]
+  @Column('varchar', { name: 'repeatDates', length: 200, default: '[]' })
+  repeatDates: string;
 
   @IsNumber()
   @Column('int', { name: 'order_num' })

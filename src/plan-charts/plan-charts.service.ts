@@ -4,7 +4,7 @@ import { Plans, Plans as PlansRepo } from 'src/entities/Plans';
 import { PlanCharts } from 'src/entities/PlanCharts';
 import { DataSource, Repository, createQueryBuilder } from 'typeorm';
 import { CreatePlanChartDto } from './dto/create-plan-chart.dto';
-import { ModifyPlanChartDto } from './dto/modify-plan-chart.dto';
+import { UpdatePlanChartDto } from './dto/modify-plan-chart.dto';
 import { SubPlans } from 'src/entities/SubPlans';
 import { PlansService } from 'src/plans/plans.service';
 import { UpdatePlanChartOrdersDto } from './dto/update-plan-chart-orders.dto';
@@ -23,14 +23,14 @@ export class PlanChartsService {
     private plansService: PlansService
   ) {}
 
-  async postPlanChart({ name, plans, userId, repeats, repeatDays }: CreatePlanChartDto & { userId: number }) {
+  async postPlanChart({ name, plans, userId, repeats, repeatDates }: CreatePlanChartDto & { userId: number }) {
     const queryRunner = this.datasource.createQueryRunner();
     queryRunner.connect();
     queryRunner.startTransaction();
     const planChart = new PlanCharts();
     try {
       // 선택일 반복일 경우
-      if (repeats.includes(7) && repeatDays.length === 0) {
+      if (repeats.includes(7) && repeatDates.length === 0) {
         throw new BadRequestException('반복 선택일이 없습니다.');
       }
 
@@ -48,7 +48,7 @@ export class PlanChartsService {
       planChart.name = name;
       planChart.repeats = JSON.stringify(repeats);
       planChart.orderNum = maxOrderNum + 1;
-      planChart.repeatDays = JSON.stringify(repeatDays);
+      planChart.repeatDates = JSON.stringify(repeatDates);
 
       const planChartReturned = await queryRunner.manager.getRepository(PlanCharts).save(planChart);
       const planPromiseArray = plans.map((plan) => {
@@ -132,7 +132,7 @@ export class PlanChartsService {
       .getMany();
 
     const chartWithPlans = planCharts.map(async (chart, index) => {
-      chart.repeatDays = JSON.parse(chart.repeatDays);
+      chart.repeatDates = JSON.parse(chart.repeatDates);
       chart.repeats = JSON.parse(chart.repeats);
       const plans = await this.planRepository
         .createQueryBuilder('plan')
@@ -154,7 +154,7 @@ export class PlanChartsService {
     return await Promise.all(chartWithPlans);
   }
 
-  async putPlanChart({ id, name, plans, repeatDays, repeats }: ModifyPlanChartDto) {
+  async updatePlanChart({ id, name, plans, repeatDates, repeats }: UpdatePlanChartDto) {
     const queryRunner = this.datasource.createQueryRunner();
     queryRunner.connect();
     queryRunner.startTransaction();
@@ -198,19 +198,19 @@ export class PlanChartsService {
       );
 
       // 선택일 반복일 경우
-      if (repeats.includes(7) && repeatDays.length === 0) {
+      if (repeats.includes(7) && repeatDates.length === 0) {
         throw new BadRequestException('반복 선택일이 없습니다.');
       }
 
       planChart.name = name;
       planChart.repeats = JSON.stringify(repeats);
-      planChart.repeatDays = JSON.stringify(repeatDays);
+      planChart.repeatDates = JSON.stringify(repeatDates);
 
       await queryRunner.manager
         .getRepository(PlanCharts)
         .createQueryBuilder()
         .update(PlanCharts)
-        .set({ name, repeatDays: JSON.stringify(repeatDays), repeats: JSON.stringify(repeats) })
+        .set({ name, repeatDates: JSON.stringify(repeatDates), repeats: JSON.stringify(repeats) })
         .where('id = :id and removed_at is null', { id })
         .execute();
 
@@ -302,7 +302,7 @@ export class PlanChartsService {
       targetPlanChart.name = targetPlanChart.name + ' Copy';
       const { id, removedAt, updatedAt, ...copiedPlanChart } = targetPlanChart;
       const planChartReturned = await queryRunner.manager.getRepository(PlanCharts).save(copiedPlanChart);
-      planChartReturned.repeatDays = JSON.parse(planChartReturned.repeatDays);
+      planChartReturned.repeatDates = JSON.parse(planChartReturned.repeatDates);
       planChartReturned.repeats = JSON.parse(planChartReturned.repeats);
 
       await queryRunner.commitTransaction();

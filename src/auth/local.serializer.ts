@@ -6,9 +6,7 @@ import { Users } from '../entities/Users';
 
 @Injectable()
 export class LocalSerializer extends PassportSerializer {
-  constructor(
-    @InjectRepository(Users) private userRepository: Repository<Users>,
-  ) {
+  constructor(@InjectRepository(Users) private userRepository: Repository<Users>) {
     super();
   }
 

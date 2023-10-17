@@ -30,7 +30,7 @@ export class Plans {
 
   @IsString()
   @IsNotEmpty()
-  @Length(1, 30, { message: '일정명을 적어주세요.' })
+  @Length(1, 30, { message: '계획명을 적어주세요.' })
   @Column('varchar', { name: 'name', length: 100 })
   name: string;
 

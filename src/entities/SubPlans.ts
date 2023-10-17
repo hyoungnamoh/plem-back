@@ -25,7 +25,7 @@ export class SubPlans {
 
   @IsString()
   @IsNotEmpty()
-  @Length(1, 30, { message: '하위 일정명을 적어주세요' })
+  @Length(1, 30, { message: '하위 계획명을 적어주세요' })
   @Column('varchar', { name: 'name', length: 100, nullable: false })
   name: string;
 
