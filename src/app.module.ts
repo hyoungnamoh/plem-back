@@ -24,9 +24,10 @@ import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { EmailModule } from './email/email.module';
 import { SubPlans } from './entities/SubPlans';
 import { SubPlansService } from './sub-plans/sub-plans.service';
-import { SchedulesController } from './schedules/schedules.controller';
 import { SchedulesService } from './schedules/schedules.service';
 import { SchedulesModule } from './schedules/schedules.module';
+import { Schedules } from './entities/Schedules';
+import { SchedulesController } from './schedules/schedules.controller';
 
 @Module({
   imports: [
@@ -34,7 +35,7 @@ import { SchedulesModule } from './schedules/schedules.module';
     PlansModule,
     UsersModule,
     TypeOrmModule.forRoot(ormconfig),
-    TypeOrmModule.forFeature([Users, Plans, PlanCharts, SubPlans]),
+    TypeOrmModule.forFeature([Users, Plans, PlanCharts, SubPlans, Schedules]),
     AuthModule,
     PlanChartsModule,
     MailerModule.forRootAsync({
@@ -57,7 +58,15 @@ import { SchedulesModule } from './schedules/schedules.module';
     SchedulesModule,
   ],
   controllers: [AppController, PlansController, UsersController, PlanChartsController, SchedulesController],
-  providers: [AppService, ConfigService, PlansService, UsersService, PlanChartsService, SubPlansService, SchedulesService],
+  providers: [
+    AppService,
+    ConfigService,
+    PlansService,
+    UsersService,
+    PlanChartsService,
+    SubPlansService,
+    SchedulesService,
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {}

@@ -2,13 +2,14 @@ import { BadRequestException, Injectable, InternalServerErrorException, NotFound
 import { InjectRepository } from '@nestjs/typeorm';
 import { Plans, Plans as PlansRepo } from 'src/entities/Plans';
 import { PlanCharts } from 'src/entities/PlanCharts';
-import { DataSource, Repository, createQueryBuilder } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CreatePlanChartDto } from './dto/create-plan-chart.dto';
-import { UpdatePlanChartDto } from './dto/modify-plan-chart.dto';
+import { UpdatePlanChartDto } from './dto/update-plan-chart.dto';
 import { SubPlans } from 'src/entities/SubPlans';
 import { PlansService } from 'src/plans/plans.service';
 import { UpdatePlanChartOrdersDto } from './dto/update-plan-chart-orders.dto';
 import { Users } from 'src/entities/Users';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class PlanChartsService {
@@ -91,19 +92,27 @@ export class PlanChartsService {
     if (!planChart) {
       throw new NotFoundException('존재하지 않는 일정표입니다.');
     }
+    planChart.repeatDates = JSON.parse(planChart.repeatDates);
+    planChart.repeats = JSON.parse(planChart.repeats);
     const plans = await this.planRepository
       .createQueryBuilder('plan')
       .where('plan.PlanChartId = :id', { id })
       .getMany();
 
-    const plansWithSubPlansPromise = plans.map(async (plan) => {
-      const subPlans = await this.subPlanRepository
-        .createQueryBuilder('sub')
-        .where('sub.PlanId = :id and sub.removed_at is null', { id: plan.id })
-        .getMany();
+    const plansWithSubPlansPromise = plans
+      .sort(
+        (a, b) =>
+          dayjs().set('hour', a.startHour).set('minute', a.startMin).unix() -
+          dayjs().set('hour', b.startHour).set('minute', b.startMin).unix()
+      )
+      .map(async (plan) => {
+        const subPlans = await this.subPlanRepository
+          .createQueryBuilder('sub')
+          .where('sub.PlanId = :id and sub.removed_at is null', { id: plan.id })
+          .getMany();
 
-      return Object.assign(plan, { subPlans });
-    });
+        return Object.assign(plan, { subPlans });
+      });
     const plansWithSubPlans = await Promise.all(plansWithSubPlansPromise);
 
     const chartWithPlans = Object.assign(planChart, { plans: plansWithSubPlans });
@@ -206,13 +215,14 @@ export class PlanChartsService {
       planChart.repeats = JSON.stringify(repeats);
       planChart.repeatDates = JSON.stringify(repeatDates);
 
-      await queryRunner.manager
+      const dd = await queryRunner.manager
         .getRepository(PlanCharts)
         .createQueryBuilder()
         .update(PlanCharts)
         .set({ name, repeatDates: JSON.stringify(repeatDates), repeats: JSON.stringify(repeats) })
         .where('id = :id and removed_at is null', { id })
         .execute();
+      console.log(dd);
 
       await queryRunner.commitTransaction();
       // return planChartReturned;
@@ -281,7 +291,6 @@ export class PlanChartsService {
         targetPlanChart.plans.map((plan) => {
           plan.PlanChartId = targetPlanChart.id;
           const { id, updatedAt, removedAt, ...planWithoutId } = plan;
-
           return queryRunner.manager.getRepository(PlansRepo).save(planWithoutId);
         })
       );
@@ -301,6 +310,9 @@ export class PlanChartsService {
 
       targetPlanChart.name = targetPlanChart.name + ' Copy';
       const { id, removedAt, updatedAt, ...copiedPlanChart } = targetPlanChart;
+
+      copiedPlanChart.repeatDates = JSON.stringify(copiedPlanChart.repeatDates);
+      copiedPlanChart.repeats = JSON.stringify(copiedPlanChart.repeats);
       const planChartReturned = await queryRunner.manager.getRepository(PlanCharts).save(copiedPlanChart);
       planChartReturned.repeatDates = JSON.parse(planChartReturned.repeatDates);
       planChartReturned.repeats = JSON.parse(planChartReturned.repeats);

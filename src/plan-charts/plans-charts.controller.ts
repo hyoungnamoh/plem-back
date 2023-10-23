@@ -17,7 +17,7 @@ import { SuccessResponseInterceptor } from 'src/common/interceptors/successRespo
 import { Users } from 'src/entities/Users';
 import { CreatePlanChartDto } from './dto/create-plan-chart.dto';
 import { PlanChartsService } from './plan-charts.service';
-import { UpdatePlanChartDto } from './dto/modify-plan-chart.dto';
+import { UpdatePlanChartDto } from './dto/update-plan-chart.dto';
 
 @Controller('plan-charts')
 @UseInterceptors(SuccessResponseInterceptor)

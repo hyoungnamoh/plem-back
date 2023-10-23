@@ -1,6 +1,4 @@
-import { OmitType } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsArray, IsDate, IsIn, IsNotEmpty, IsNumber, IsString, Length, ValidateNested } from 'class-validator';
+import { IsDate, IsIn, IsNotEmpty, IsNumber, IsString, Length } from 'class-validator';
 import { invalidErrorMessage } from 'src/common/helper/invalidErrorMessage';
 import {
   Column,
@@ -10,22 +8,19 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { PlanCharts } from './PlanCharts';
-import { SubPlans } from './SubPlans';
+import { Users } from './Users';
 
-@Index('schedule_id', ['ScheduleId'], {})
+@Index('id', ['id'], {})
 @Entity('SCHEDULES', { schema: 'plem' })
 export class Schedules {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;
 
-  @Column('int', { name: 'schedule_id', nullable: false })
-  @IsNotEmpty()
-  ScheduleId: number;
+  @Column('int', { name: 'user_id', nullable: false })
+  UserId: number;
 
   @IsString()
   @IsNotEmpty()
@@ -37,29 +32,34 @@ export class Schedules {
   @Column('int', { name: 'category' })
   category: number;
 
-  @IsDate({ message: invalidErrorMessage })
-  @Column('datetime', { name: 'start_date' })
-  startDate: Date;
+  @Column('timestamp', { name: 'start_date', nullable: false })
+  startDate: string;
 
-  @IsDate({ message: invalidErrorMessage })
-  @Column('datetime', { name: 'end_date' })
-  endDate: Date;
+  @Column('timestamp', { name: 'end_date', nullable: false })
+  endDate: string;
 
   @IsIn([null, '0', '5', '10', '15', '30', '60'], { message: invalidErrorMessage })
   @Column('varchar', { name: 'notification', length: 100, nullable: true })
   notification: number | null;
 
   @IsNotEmpty({ message: '반복 값이 없습니다.' })
-  @IsIn([null, 'everyDay', 'everyWeek', 'every2Weeks', 'everyMonth', 'everyYear'], { message: invalidErrorMessage })
+  @IsIn([null, 'every', 'week', '2weeks', 'month', 'year', 'custom'], { message: invalidErrorMessage })
   @Column('varchar', { name: 'repeats', length: 100, nullable: true })
   repeats: string | null;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
-  @UpdateDateColumn({ nullable: true, default: null })
+  @UpdateDateColumn({ type: 'timestamp', nullable: true, default: null })
   updatedAt: Date | null;
 
-  @DeleteDateColumn({ name: 'removed_at' })
+  @DeleteDateColumn({ type: 'timestamp', name: 'removed_at' })
   removedAt: Date | null;
+
+  @ManyToOne(() => Users, (users) => users.Schedules, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn([{ name: 'user_id', referencedColumnName: 'id' }])
+  User: Users;
 }

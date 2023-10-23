@@ -10,6 +10,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { PlanCharts } from './PlanCharts';
+import { Schedules } from './Schedules';
 
 @Index('email', ['email'], { unique: true })
 @Entity('USERS', { schema: 'plem' })
@@ -59,6 +60,9 @@ export class Users {
   @DeleteDateColumn({ name: 'removed_at' })
   removedAt: Date | null;
 
-  @OneToMany(() => PlanCharts, (planChart) => planChart.User)
+  @OneToMany(() => PlanCharts, (planCharts) => planCharts.User)
   PlanCharts: PlanCharts;
+
+  @OneToMany(() => Schedules, (schedules) => schedules.User)
+  Schedules: Schedules;
 }

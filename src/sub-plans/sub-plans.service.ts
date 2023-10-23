@@ -25,7 +25,7 @@ export class SubPlansService {
           .where('id = :id', { id })
           .execute();
         if (deletedResult.affected && deletedResult.affected < 1) {
-          throw new NotFoundException('삭제할 일정이 존재하지 않습니다.');
+          throw new NotFoundException('삭제할 계획이 존재하지 않습니다.');
         }
       });
 
