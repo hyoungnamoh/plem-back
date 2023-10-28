@@ -4,6 +4,8 @@ import { Plans } from 'src/entities/Plans';
 import { PlanCharts } from 'src/entities/PlanCharts';
 import { SubPlans } from 'src/entities/SubPlans';
 import { Users } from 'src/entities/Users';
+import { Schedules } from 'src/entities/Schedules';
+import { Notices } from 'src/entities/Notices';
 
 dotenv.config();
 
@@ -14,7 +16,7 @@ const ormconfig: TypeOrmModuleOptions = {
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  entities: [Users, PlanCharts, Plans, SubPlans],
+  entities: [Users, PlanCharts, Plans, SubPlans, Schedules, Notices],
   migrations: [__dirname + '/src/migrations/*.ts'],
   // cli: { migrationsDir: 'src/migrations' },
   charset: 'utf8mb4',

@@ -28,6 +28,10 @@ import { SchedulesService } from './schedules/schedules.service';
 import { SchedulesModule } from './schedules/schedules.module';
 import { Schedules } from './entities/Schedules';
 import { SchedulesController } from './schedules/schedules.controller';
+import { NoticeController } from './notices/notices.controller';
+import { NoticeService } from './notices/notices.service';
+import { NoticeModule } from './notices/notices.module';
+import { Notices } from './entities/Notices';
 
 @Module({
   imports: [
@@ -35,7 +39,7 @@ import { SchedulesController } from './schedules/schedules.controller';
     PlansModule,
     UsersModule,
     TypeOrmModule.forRoot(ormconfig),
-    TypeOrmModule.forFeature([Users, Plans, PlanCharts, SubPlans, Schedules]),
+    TypeOrmModule.forFeature([Users, Plans, PlanCharts, SubPlans, Schedules, Notices]),
     AuthModule,
     PlanChartsModule,
     MailerModule.forRootAsync({
@@ -56,8 +60,16 @@ import { SchedulesController } from './schedules/schedules.controller';
     }),
     EmailModule,
     SchedulesModule,
+    NoticeModule,
   ],
-  controllers: [AppController, PlansController, UsersController, PlanChartsController, SchedulesController],
+  controllers: [
+    AppController,
+    PlansController,
+    UsersController,
+    PlanChartsController,
+    SchedulesController,
+    NoticeController,
+  ],
   providers: [
     AppService,
     ConfigService,
@@ -66,6 +78,7 @@ import { SchedulesController } from './schedules/schedules.controller';
     PlanChartsService,
     SubPlansService,
     SchedulesService,
+    NoticeService,
   ],
 })
 export class AppModule implements NestModule {
