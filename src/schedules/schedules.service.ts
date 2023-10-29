@@ -30,7 +30,7 @@ export class SchedulesService {
     const schedule = this.scheduleRepository.create({
       UserId: userId,
       name,
-      repeats: JSON.stringify(repeats),
+      repeats,
       startDate,
       endDate,
       category,
@@ -94,7 +94,7 @@ export class SchedulesService {
         .getRepository(Schedules)
         .createQueryBuilder()
         .update(Schedules)
-        .set({ name, repeats: JSON.stringify(repeats), startDate, endDate, category, notification })
+        .set({ name, repeats, startDate, endDate, category, notification })
         .where('id = :id and removed_at is null and UserId = :userId', { id, userId })
         .execute();
 

@@ -7,6 +7,5 @@ export class CreateScheduleDto extends PickType(Schedules, [
   'startDate',
   'endDate',
   'notification',
-] as const) {
-  repeats: (null | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7)[];
-}
+  'repeats',
+] as const) {}

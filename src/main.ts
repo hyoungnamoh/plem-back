@@ -3,11 +3,13 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './http-exception.filter';
 import passport from 'passport';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import path from 'path';
 
 declare const module: any;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const port = process.env.PORT || 3000;
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(
@@ -16,6 +18,17 @@ async function bootstrap() {
     })
   );
   app.use(passport.initialize());
+
+  if (process.env.NODE_ENV === 'production') {
+    // 수정 필요
+    app.enableCors({ origin: ['https://'], credentials: true });
+  } else {
+    app.enableCors({ origin: true, credentials: true });
+  }
+
+  app.useStaticAssets(path.join(__dirname, '..', 'notice-images'), {
+    prefix: '/notice-images',
+  });
 
   process.on('uncaughtException', (err) => {
     console.info(err);

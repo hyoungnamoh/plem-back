@@ -22,7 +22,7 @@ export class PlanChartsService {
     private subPlanRepository: Repository<SubPlans>,
     private datasource: DataSource,
     private plansService: PlansService
-  ) {}
+  ) { }
 
   async postPlanChart({ name, plans, userId, repeats, repeatDates }: CreatePlanChartDto & { userId: number }) {
     const queryRunner = this.datasource.createQueryRunner();
@@ -78,6 +78,36 @@ export class PlanChartsService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async getTodayPlanChart(user: Users) {
+    // 오더바이 추가 필요
+    const planCharts = await this.planChartRepository
+      .createQueryBuilder('planChart')
+      .where('planChart.removed_at is null and planChart.UserId = :userId', {
+        userId: user.id,
+      })
+      .getMany();
+
+    if (planCharts.length === 0) {
+      return null;
+    }
+
+    const dateRepeatChart = planCharts.find((chart) => {
+      return JSON.parse(chart.repeatDates).includes(dayjs().get('date'));
+    });
+    if (dateRepeatChart) {
+      return this.getPlanChart({ id: dateRepeatChart.id }, user);
+    }
+
+    const dayRepeatChart = planCharts.find((chart) => {
+      return JSON.parse(chart.repeats).includes(dayjs().get('day'));
+    });
+    if (dayRepeatChart) {
+      return this.getPlanChart({ id: dayRepeatChart.id }, user);
+    }
+
+    return null;
   }
 
   async getPlanChart({ id }: { id: number }, user: Users) {
@@ -147,14 +177,20 @@ export class PlanChartsService {
         .createQueryBuilder('plan')
         .where('plan.PlanChartId = :id and plan.removed_at is null', { id: chart.id })
         .getMany();
-      const planWithSubPlansPromise = plans.map(async (plan) => {
-        const subPlans = await this.subPlanRepository
-          .createQueryBuilder('sub')
-          .where('sub.plan = :id and sub.removed_at is null', { id: plan.id })
-          .getMany();
-        Object.assign(plan, { subPlans });
-        return plan;
-      });
+      const planWithSubPlansPromise = plans
+        .sort(
+          (a, b) =>
+            dayjs().set('hour', a.startHour).set('minute', a.startMin).unix() -
+            dayjs().set('hour', b.startHour).set('minute', b.startMin).unix()
+        )
+        .map(async (plan) => {
+          const subPlans = await this.subPlanRepository
+            .createQueryBuilder('sub')
+            .where('sub.plan = :id and sub.removed_at is null', { id: plan.id })
+            .getMany();
+          Object.assign(plan, { subPlans });
+          return plan;
+        });
       const plansWithSubPlans = await Promise.all(planWithSubPlansPromise);
       Object.assign(chart, { plans: plansWithSubPlans });
       return chart;
