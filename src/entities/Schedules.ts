@@ -42,7 +42,6 @@ export class Schedules {
   @Column('varchar', { name: 'notification', length: 100, nullable: true })
   notification: number | null;
 
-  @IsNotEmpty({ message: '반복 값이 없습니다.' })
   @IsIn([null, 'every', 'week', '2weeks', 'month', 'year', 'custom'], { message: invalidErrorMessage })
   @Column('varchar', { name: 'repeats', length: 100, nullable: true })
   repeats: string | null;

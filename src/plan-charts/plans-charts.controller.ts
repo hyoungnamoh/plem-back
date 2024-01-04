@@ -31,6 +31,13 @@ export class PlanChartsController {
     return await this.planChartService.postPlanChart(Object.assign(body, { userId: user.id }));
   }
 
+  // 오늘 계획표 가져오기
+  @Get('/today')
+  @UseGuards(JwtAuthGuard)
+  getTodayPlanChart(@UserDeco() user: Users) {
+    return this.planChartService.getTodayPlanChart(user);
+  }
+
   // 계획표 가져오기
   @Get('/:id')
   @UseGuards(JwtAuthGuard)
