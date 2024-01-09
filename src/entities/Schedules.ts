@@ -42,7 +42,7 @@ export class Schedules {
   @Column('varchar', { name: 'notification', length: 100, nullable: true })
   notification: number | null;
 
-  @IsIn([null, 'every', 'week', '2weeks', 'month', 'year', 'custom'], { message: invalidErrorMessage })
+  @IsIn([null, 'every', 'week', 'twoWeeks', 'month', 'year', 'custom'], { message: invalidErrorMessage })
   @Column('varchar', { name: 'repeats', length: 100, nullable: true })
   repeats: string | null;
 

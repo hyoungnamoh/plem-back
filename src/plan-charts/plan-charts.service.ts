@@ -22,7 +22,7 @@ export class PlanChartsService {
     private subPlanRepository: Repository<SubPlans>,
     private datasource: DataSource,
     private plansService: PlansService
-  ) { }
+  ) {}
 
   async postPlanChart({ name, plans, userId, repeats, repeatDates }: CreatePlanChartDto & { userId: number }) {
     const queryRunner = this.datasource.createQueryRunner();

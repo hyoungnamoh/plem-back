@@ -48,24 +48,87 @@ export class SchedulesService {
     }
   }
 
-  async getSchedules({ userId, date }: { userId: number; date: string }) {
-    const targetDate = dayjs(date);
+  async getAllSchedules({ userId }: { userId: number }) {
+    const noRepeatSchedules = this.getSchedules({ userId });
+    const repeatSchedules = this.getRepeatSchedules({ userId });
+    const scheduleResults = await Promise.all([noRepeatSchedules, repeatSchedules]);
+
+    return {
+      noRepeatSchedules: scheduleResults[0],
+      repeatSchedules: scheduleResults[1],
+    };
+  }
+
+  async getSchedules({ userId }: { userId: number }) {
     const schedules = await this.scheduleRepository
       .createQueryBuilder('schedule')
-      .where(
-        'schedule.UserId = :userId and schedule.removed_at is null and YEAR(start_date) = :year AND MONTH(start_date) = :month',
-        { userId, year: targetDate.get('year'), month: targetDate.get('month') + 1 }
-      )
+      .where('schedule.UserId = :userId and schedule.removed_at is null and schedule.repeats is null', {
+        userId,
+      })
+      .orderBy('start_date', 'ASC')
       .getMany();
-    const sheduleCalendar = {};
-    Array.from({ length: dayjs(targetDate).daysInMonth() }, (_, index) => index + 1).map((date) => {
-      sheduleCalendar[date] = schedules.filter((schedule) => {
-        const startDate = dayjs(schedule.startDate);
-        return startDate.get('date') === date;
-      });
+
+    if (schedules.length === 0) {
+      return [];
+    }
+
+    const noRepeatSchedules = schedules.filter((schedule) => schedule.repeats === null);
+    const firstScheduleDate = dayjs(schedules[0].startDate);
+    const lastScheduleDate = dayjs(schedules[schedules.length - 1].endDate);
+    const noRepeatScheduleMap = {};
+
+    for (let year = firstScheduleDate.get('year'); year <= lastScheduleDate.get('year'); year++) {
+      noRepeatScheduleMap[year] = {};
+      for (let month = 0; month <= 11; month++) {
+        const yearMonth = dayjs().set('year', year).set('month', month);
+        noRepeatScheduleMap[year][month] = {};
+        for (let date = 1; date <= yearMonth.daysInMonth(); date++) {
+          noRepeatScheduleMap[year][month][date] = [];
+        }
+      }
+    }
+
+    noRepeatSchedules.map((schedule) => {
+      const startDate = dayjs(schedule.startDate);
+
+      noRepeatScheduleMap[startDate.get('year')][startDate.get('month')][startDate.get('date')].push(schedule);
     });
 
-    return sheduleCalendar;
+    return noRepeatScheduleMap;
+  }
+
+  async getRepeatSchedules({ userId }: { userId: number }) {
+    const schedules = await this.scheduleRepository
+      .createQueryBuilder('schedule')
+      .where('schedule.UserId = :userId and schedule.removed_at is null and schedule.repeats is not null', {
+        userId,
+      })
+      .orderBy('start_date', 'ASC')
+      .getMany();
+
+    if (schedules.length === 0) {
+      return {
+        yearlyRepeatSchedules: [],
+        monthlyRepeatSchedules: [],
+        twoWeeklyRepeatSchedules: [],
+        weeklyRepeatSchedules: [],
+        dailyRepeatSchedules: [],
+      };
+    }
+
+    const yearlyRepeatSchedules = schedules.filter((schedule) => schedule.repeats === 'year');
+    const monthlyRepeatSchedules = schedules.filter((schedule) => schedule.repeats === 'month');
+    const twoWeeklyRepeatSchedules = schedules.filter((schedule) => schedule.repeats === 'twoWeeks');
+    const weeklyRepeatSchedules = schedules.filter((schedule) => schedule.repeats === 'week');
+    const dailyRepeatSchedules = schedules.filter((schedule) => schedule.repeats === 'every');
+
+    return {
+      yearlyRepeatSchedules,
+      monthlyRepeatSchedules,
+      twoWeeklyRepeatSchedules,
+      weeklyRepeatSchedules,
+      dailyRepeatSchedules,
+    };
   }
 
   async updateSchedule({

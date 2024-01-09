@@ -19,11 +19,11 @@ export class SchedulesController {
     return await this.schedulesService.postSchedule(Object.assign(body, { userId: user.id }));
   }
 
-  // 일정 목록 가져오기
+  // 전체 일정 목록 가져오기
   @Get('')
   @UseGuards(JwtAuthGuard)
-  getSchedules(@Query() query: { date: string }, @UserDeco() user: Users) {
-    return this.schedulesService.getSchedules({ ...query, userId: user.id });
+  getSchedules(@UserDeco() user: Users) {
+    return this.schedulesService.getAllSchedules({ userId: user.id });
   }
 
   // 일정 수정 가져오기
