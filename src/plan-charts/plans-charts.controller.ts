@@ -48,8 +48,8 @@ export class PlanChartsController {
   // 계획표 수정
   @Put('/:id')
   @UseGuards(JwtAuthGuard)
-  updatePlanChart(@Param() param: { id: number }, @Body() body: UpdatePlanChartDto) {
-    return this.planChartService.updatePlanChart({ ...param, ...body });
+  updatePlanChart(@Param() param: { id: number }, @Body() body: UpdatePlanChartDto, @UserDeco() user: Users) {
+    return this.planChartService.updatePlanChart({ ...param, ...body, userId: user.id });
   }
 
   // 계획표 삭제

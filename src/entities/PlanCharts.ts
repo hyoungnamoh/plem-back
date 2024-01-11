@@ -43,6 +43,7 @@ export class PlanCharts {
   name: string;
 
   // 안함 | 일 | 월 | 화 | 수 | 목 | 금 | 토 | 날짜 지정
+  // null | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
   @IsNotEmpty({ message: '반복 값이 없습니다.' })
   @IsArray()
   @ArrayNotEmpty({ message: '반복 값이 없습니다.' })

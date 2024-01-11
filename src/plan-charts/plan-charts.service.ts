@@ -30,9 +30,18 @@ export class PlanChartsService {
     queryRunner.startTransaction();
     const planChart = new PlanCharts();
     try {
-      // 선택일 반복일 경우
       if (repeats.includes(7) && repeatDates.length === 0) {
         throw new BadRequestException('반복 선택일이 없습니다.');
+      }
+
+      const duplicatedRepeatChart = await this.checkDuplicatedRepeatDay({
+        userId,
+        newChartRepeats: repeats,
+        newChartRepeatDates: repeatDates,
+      });
+
+      if (duplicatedRepeatChart) {
+        throw new BadRequestException(`"${duplicatedRepeatChart.name}" 일정표와 반복일이 중복됩니다.`);
       }
 
       const maxRow = await this.planChartRepository.manager.query(
@@ -163,7 +172,7 @@ export class PlanChartsService {
     await this.planChartRepository.delete(id);
   }
 
-  async getPlanCharts({ userId }) {
+  async getPlanCharts({ userId }: { userId: number }) {
     const planCharts = await this.planChartRepository
       .createQueryBuilder('chart')
       .where('chart.UserId = :userId and chart.removed_at is null', { userId })
@@ -199,7 +208,7 @@ export class PlanChartsService {
     return await Promise.all(chartWithPlans);
   }
 
-  async updatePlanChart({ id, name, plans, repeatDates, repeats }: UpdatePlanChartDto) {
+  async updatePlanChart({ id, name, plans, repeatDates, repeats, userId }: UpdatePlanChartDto & { userId: number }) {
     const queryRunner = this.datasource.createQueryRunner();
     queryRunner.connect();
     queryRunner.startTransaction();
@@ -212,6 +221,16 @@ export class PlanChartsService {
         throw new NotFoundException('존재하지 않는 일정표입니다.');
       }
 
+      const duplicatedRepeatChart = await this.checkDuplicatedRepeatDay({
+        userId,
+        newChartId: id,
+        newChartRepeats: repeats,
+        newChartRepeatDates: repeatDates,
+      });
+
+      if (duplicatedRepeatChart) {
+        throw new BadRequestException(`"${duplicatedRepeatChart.name}" 일정표와 반복일이 중복됩니다.`);
+      }
       const originPlans = await queryRunner.manager
         .getRepository(Plans)
         .createQueryBuilder()
@@ -361,5 +380,55 @@ export class PlanChartsService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async getOnlyPlanCharts({ userId }) {
+    const planCharts = await this.planChartRepository
+      .createQueryBuilder('chart')
+      .where('chart.UserId = :userId and chart.removed_at is null', { userId })
+      .getMany();
+
+    return planCharts;
+  }
+
+  async checkDuplicatedRepeatDay({
+    userId,
+    newChartId,
+    newChartRepeats,
+    newChartRepeatDates,
+  }: {
+    userId: number;
+    newChartId?: number;
+    newChartRepeats: CreatePlanChartDto['repeats'];
+    newChartRepeatDates: CreatePlanChartDto['repeatDates'];
+  }) {
+    const charts = await this.getOnlyPlanCharts({ userId });
+    // 안함일 경우 체크 안함
+    if (newChartRepeats.includes(null)) {
+      return false;
+    }
+
+    // 날짜 지정의 경우 지정한 날짜 중복 체크
+    if (newChartRepeats.includes(7)) {
+      return charts.find((chart) => {
+        if (newChartId && chart.id === newChartId) {
+          return false;
+        }
+
+        const repeatDates = JSON.parse(chart.repeatDates) as CreatePlanChartDto['repeatDates'];
+        return repeatDates.find((repeatDate) => newChartRepeatDates.includes(repeatDate));
+      });
+    }
+
+    // 중복 요일 체크
+    return charts.find((chart) => {
+      if (newChartId && chart.id === newChartId) {
+        return false;
+      }
+
+      const repeats = JSON.parse(chart.repeats) as CreatePlanChartDto['repeats'];
+      // 월요일일 경우 0이므로 falsy값 처리
+      return typeof repeats.find((repeat) => newChartRepeats.includes(repeat)) === 'number';
+    });
   }
 }
