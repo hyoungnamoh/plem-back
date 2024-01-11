@@ -366,8 +366,8 @@ export class PlanChartsService {
       targetPlanChart.name = targetPlanChart.name + ' Copy';
       const { id, removedAt, updatedAt, ...copiedPlanChart } = targetPlanChart;
 
-      copiedPlanChart.repeatDates = JSON.stringify(copiedPlanChart.repeatDates);
-      copiedPlanChart.repeats = JSON.stringify(copiedPlanChart.repeats);
+      copiedPlanChart.repeatDates = JSON.stringify([]);
+      copiedPlanChart.repeats = JSON.stringify([null]);
       const planChartReturned = await queryRunner.manager.getRepository(PlanCharts).save(copiedPlanChart);
       planChartReturned.repeatDates = JSON.parse(planChartReturned.repeatDates);
       planChartReturned.repeats = JSON.parse(planChartReturned.repeats);
