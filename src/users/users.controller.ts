@@ -93,6 +93,10 @@ export class UsersController {
     return await this.userService.updatePassword(body);
   }
 
-  // @Get('/verification-code/verify') // 인증번호 체크
-  // checkVerifyCode() {}
+  // 이메일 변경
+  @Put('/email')
+  @UseGuards(JwtAuthGuard)
+  async updateEmail(@Body() body: { newEmail: string }, @UserDeco() user: Users) {
+    return await this.userService.updateEmail({ ...body, userId: user.id });
+  }
 }

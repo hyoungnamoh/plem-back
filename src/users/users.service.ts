@@ -164,8 +164,8 @@ export class UsersService {
 
     const user = await this.userRepository.findOne({
       where: { email },
-      withDeleted: true,
     });
+
     if (!user) {
       throw new NotFoundException('존재하지 않는 이메일입니다.');
     }
@@ -182,5 +182,75 @@ export class UsersService {
     return {
       id: user.id,
     };
+  }
+
+  // async updateEmail({ newEmail, originEmail }: { newEmail: string; originEmail: string }) {
+  //   if (!newEmail) {
+  //     throw new BadRequestException('이메일을 입력해 주세요.');
+  //   }
+
+  //   const user = await this.userRepository.findOne({
+  //     where: { email: originEmail },
+  //   });
+  //   if (!user) {
+  //     throw new NotFoundException('존재하지 않는 이메일입니다.');
+  //   }
+
+  //   const result = await this.userRepository.update(user.id, {
+  //     email: newEmail,
+  //   });
+
+  //   if (result.affected && result.affected < 1) {
+  //     throw new InternalServerErrorException('이메일 변경에 실패했습니다. 잠시후 다시 시도해주세요.');
+  //   }
+
+  //   return {
+  //     id: user.id,
+  //   };
+  // }
+
+  async updateEmail({ newEmail, userId }: { newEmail: string; userId: number }) {
+    const queryRunner = this.datasource.createQueryRunner();
+    try {
+      queryRunner.connect();
+      queryRunner.startTransaction();
+      const user = await this.userRepository.createQueryBuilder('user').where('id = :userId', { userId }).getOne();
+
+      if (!newEmail) {
+        throw new BadRequestException('닉네임을 입력해주세요.');
+      }
+
+      if (!user || user.removedAt) {
+        throw new BadRequestException('계정을 찾을 수가 없습니다.');
+      }
+
+      if (user.email === newEmail) {
+        throw new BadRequestException('기존 닉네임과 동일합니다.');
+      }
+      const newEmailUser: Users = { ...user, email: newEmail };
+
+      const { newAccessToken, newRefreshToken } = await this.authService.getTokens(newEmailUser);
+
+      await queryRunner.manager
+        .getRepository(Users)
+        .createQueryBuilder('user')
+        .update(Users)
+        .set({ email: newEmail, refreshToken: newRefreshToken })
+        .where('id = :userId', { userId })
+        .execute();
+
+      await queryRunner.commitTransaction();
+
+      return {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+        id: userId,
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 }
