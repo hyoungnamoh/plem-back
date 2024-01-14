@@ -76,8 +76,8 @@ export class UsersController {
 
   @Post('/logout')
   @UseGuards(JwtAuthGuard)
-  async logout(@UserDeco() user: Users) {
-    return await this.authService.logout(user.id);
+  async logout(@UserDeco() user: Users, @Body() body: { phoneToken: string }) {
+    return await this.authService.logout({ userId: user.id, ...body });
   }
 
   // 닉네임 변경

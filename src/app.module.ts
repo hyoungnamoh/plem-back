@@ -32,6 +32,10 @@ import { NoticeController } from './notices/notices.controller';
 import { NoticeService } from './notices/notices.service';
 import { NoticeModule } from './notices/notices.module';
 import { Notices } from './entities/Notices';
+import { PushNotifications } from './entities/PushNotifications';
+import { PushNotificationsModule } from './push-notifications/push-notifications.module';
+import { PushNotificationsController } from './push-notifications/push-notifications.controller';
+import { PushNotificationsService } from './push-notifications/push-notifications.service';
 
 @Module({
   imports: [
@@ -39,7 +43,7 @@ import { Notices } from './entities/Notices';
     PlansModule,
     UsersModule,
     TypeOrmModule.forRoot(ormconfig),
-    TypeOrmModule.forFeature([Users, Plans, PlanCharts, SubPlans, Schedules, Notices]),
+    TypeOrmModule.forFeature([Users, Plans, PlanCharts, SubPlans, Schedules, Notices, PushNotifications]),
     AuthModule,
     PlanChartsModule,
     MailerModule.forRootAsync({
@@ -61,6 +65,7 @@ import { Notices } from './entities/Notices';
     EmailModule,
     SchedulesModule,
     NoticeModule,
+    PushNotificationsModule,
   ],
   controllers: [
     AppController,
@@ -69,6 +74,7 @@ import { Notices } from './entities/Notices';
     PlanChartsController,
     SchedulesController,
     NoticeController,
+    PushNotificationsController,
   ],
   providers: [
     AppService,
@@ -79,6 +85,7 @@ import { Notices } from './entities/Notices';
     SubPlansService,
     SchedulesService,
     NoticeService,
+    PushNotificationsService,
   ],
 })
 export class AppModule implements NestModule {

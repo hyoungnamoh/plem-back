@@ -10,6 +10,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { PlanCharts } from './PlanCharts';
+import { PushNotifications } from './PushNotifications';
 import { Schedules } from './Schedules';
 
 @Index('email', ['email'], { unique: true })
@@ -65,4 +66,7 @@ export class Users {
 
   @OneToMany(() => Schedules, (schedules) => schedules.User)
   Schedules: Schedules;
+
+  @OneToMany(() => PushNotifications, (pushNotifications) => pushNotifications.UserId)
+  PushNotifications: PushNotifications;
 }

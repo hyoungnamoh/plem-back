@@ -6,6 +6,7 @@ import { SubPlans } from 'src/entities/SubPlans';
 import { Users } from 'src/entities/Users';
 import { Schedules } from 'src/entities/Schedules';
 import { Notices } from 'src/entities/Notices';
+import { PushNotifications } from 'src/entities/PushNotifications';
 
 dotenv.config();
 
@@ -16,7 +17,7 @@ const ormconfig: TypeOrmModuleOptions = {
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  entities: [Users, PlanCharts, Plans, SubPlans, Schedules, Notices],
+  entities: [Users, PlanCharts, Plans, SubPlans, Schedules, Notices, PushNotifications],
   migrations: [__dirname + '/src/migrations/*.ts'],
   // cli: { migrationsDir: 'src/migrations' },
   charset: 'utf8mb4',
