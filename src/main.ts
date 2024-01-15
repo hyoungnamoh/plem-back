@@ -23,7 +23,7 @@ async function bootstrap() {
     // 수정 필요
     app.enableCors({ origin: ['https://'], credentials: true });
   } else {
-    app.enableCors({ origin: true, credentials: true });
+    app.enableCors({ origin: '*', credentials: true, methods: 'GET,HEAD,PUT,PATCH,POST,DELETE' });
   }
 
   app.useStaticAssets(path.join(__dirname, '..', 'notice-images'), {
