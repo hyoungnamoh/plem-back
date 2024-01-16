@@ -14,7 +14,7 @@ import {
 import { Users } from './Users';
 
 @Index('id', ['id'], {})
-@Entity('SCHEDULES', { schema: 'plem' })
+@Entity('schedules', { schema: 'plem' })
 export class Schedules {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;

@@ -1,14 +1,4 @@
-import {
-  ArrayNotEmpty,
-  IsArray,
-  IsIn,
-  IsJSON,
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-  Length,
-  ValidateNested,
-} from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsNotEmpty, IsNumber, IsString, Length, ValidateNested } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
@@ -24,11 +14,10 @@ import {
 import { Users } from './Users';
 import { Plans } from './Plans';
 import { Type } from 'class-transformer';
-import { OmitType, PickType } from '@nestjs/swagger';
-import { invalidErrorMessage } from 'src/common/helper/invalidErrorMessage';
+import { OmitType } from '@nestjs/swagger';
 
 @Index('user_id', ['UserId'], {})
-@Entity('PLAN_CHARTS', { schema: 'plem' })
+@Entity('plan_charts', { schema: 'plem' })
 export class PlanCharts {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;

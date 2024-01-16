@@ -13,7 +13,7 @@ import { Users } from './Users';
 import { Plans } from './Plans';
 
 @Index('user_id', ['userId'], {})
-@Entity('PLAN_CHARTS', { schema: 'plem' })
+@Entity('plan_charts', { schema: 'plem' })
 export class PlanCharts {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;

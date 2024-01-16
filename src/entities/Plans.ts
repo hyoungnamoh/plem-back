@@ -18,7 +18,7 @@ import { PlanCharts } from './PlanCharts';
 import { SubPlans } from './SubPlans';
 
 @Index('plan_chart_id', ['PlanChartId'], {})
-@Entity('PLANS', { schema: 'plem' })
+@Entity('plans', { schema: 'plem' })
 export class Plans {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;

@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 
 @Index('id', ['id'], {})
-@Entity('NOTICES', { schema: 'plem' })
+@Entity('notices', { schema: 'plem' })
 export class Notices {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;

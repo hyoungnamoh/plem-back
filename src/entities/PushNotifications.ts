@@ -13,7 +13,7 @@ import {
 import { Users } from './Users';
 
 @Index('id', ['id'], {})
-@Entity('PushNotifications', { schema: 'plem' })
+@Entity('push_notifications', { schema: 'plem' })
 export class PushNotifications {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;

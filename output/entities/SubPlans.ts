@@ -1,15 +1,8 @@
-import {
-  Column,
-  Entity,
-  Index,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Plans } from './Plans';
 
 @Index('plan_id', ['planId'], {})
-@Entity('SUB_PLANS', { schema: 'plem' })
+@Entity('sub_plans', { schema: 'plem' })
 export class SubPlans {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;

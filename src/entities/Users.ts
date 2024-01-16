@@ -14,7 +14,7 @@ import { PushNotifications } from './PushNotifications';
 import { Schedules } from './Schedules';
 
 @Index('email', ['email'], { unique: true })
-@Entity('USERS', { schema: 'plem' })
+@Entity('users', { schema: 'plem' })
 export class Users {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' }) // name: db 컬럼명
   id: number; // js단에서 사용할 변수명
