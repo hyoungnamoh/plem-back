@@ -7,6 +7,9 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import path from 'path';
 import * as fcmServiceAccountKey from '../fcmServiceAccountKey.json';
 import * as admin from 'firebase-admin';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 
 declare const module: any;
 
@@ -37,6 +40,10 @@ async function bootstrap() {
   admin.initializeApp({
     credential: admin.credential.cert(fcmServiceAccount),
   });
+
+  dayjs.extend(utc);
+  dayjs.extend(timezone);
+  dayjs.tz.setDefault('Asia/Seoul');
 
   if (process.env.NODE_ENV === 'production') {
     // 수정 필요
