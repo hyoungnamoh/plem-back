@@ -36,7 +36,7 @@ export class Plans {
 
   @IsIn([null, '0', '5', '10', '15', '30', '60'], { message: invalidErrorMessage })
   @Column('varchar', { name: 'notification', length: 100, nullable: true })
-  notification: number | null;
+  notification: '0' | '5' | '10' | '15' | '30' | '60' | null;
 
   @IsNumber({}, { message: invalidErrorMessage })
   @Column('int', { name: 'start_hour' })

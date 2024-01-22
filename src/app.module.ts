@@ -36,6 +36,9 @@ import { PushNotifications } from './entities/PushNotifications';
 import { PushNotificationsModule } from './push-notifications/push-notifications.module';
 import { PushNotificationsController } from './push-notifications/push-notifications.controller';
 import { PushNotificationsService } from './push-notifications/push-notifications.service';
+import { BatchController } from './batch/batch.controller';
+import { BatchModule } from './batch/batch.module';
+import { FcmServiceModule } from './fcm/fcm.module';
 
 @Module({
   imports: [
@@ -53,7 +56,7 @@ import { PushNotificationsService } from './push-notifications/push-notification
         return {
           ...config.get('email'),
           template: {
-            dir: path.join(__dirname, '/templates/'),
+            dir: path.join(__dirname, '/src/templates/'),
             adapter: new EjsAdapter(),
             options: {
               strict: true,
@@ -66,6 +69,8 @@ import { PushNotificationsService } from './push-notifications/push-notification
     SchedulesModule,
     NoticeModule,
     PushNotificationsModule,
+    BatchModule,
+    FcmServiceModule,
   ],
   controllers: [
     AppController,
@@ -75,6 +80,7 @@ import { PushNotificationsService } from './push-notifications/push-notification
     SchedulesController,
     NoticeController,
     PushNotificationsController,
+    BatchController,
   ],
   providers: [
     AppService,

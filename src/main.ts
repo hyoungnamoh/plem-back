@@ -5,6 +5,8 @@ import { HttpExceptionFilter } from './http-exception.filter';
 import passport from 'passport';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import path from 'path';
+import * as fcmServiceAccountKey from '../fcmServiceAccountKey.json';
+import * as admin from 'firebase-admin';
 
 declare const module: any;
 
@@ -18,6 +20,23 @@ async function bootstrap() {
     })
   );
   app.use(passport.initialize());
+
+  const fcmServiceAccount = {
+    type: fcmServiceAccountKey.type,
+    projectId: fcmServiceAccountKey.project_id,
+    privateKeyId: fcmServiceAccountKey.private_key_id,
+    privateKey: fcmServiceAccountKey.private_key,
+    clientEmail: fcmServiceAccountKey.client_email,
+    clientId: fcmServiceAccountKey.client_id,
+    authUri: fcmServiceAccountKey.auth_uri,
+    tokenUri: fcmServiceAccountKey.token_uri,
+    authProviderX509CertUrl: fcmServiceAccountKey.auth_provider_x509_cert_url,
+    clientC509CertUrl: fcmServiceAccountKey.client_x509_cert_url,
+  };
+
+  admin.initializeApp({
+    credential: admin.credential.cert(fcmServiceAccount),
+  });
 
   if (process.env.NODE_ENV === 'production') {
     // 수정 필요

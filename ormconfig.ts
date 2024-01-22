@@ -21,7 +21,7 @@ const ormconfig: TypeOrmModuleOptions = {
   migrations: [__dirname + '/src/migrations/*.ts'],
   // cli: { migrationsDir: 'src/migrations' },
   charset: 'utf8mb4',
-  logging: process.env.NODE_ENV !== 'production',
+  // logging: process.env.NODE_ENV !== 'production',
   keepConnectionAlive: true,
   // synchronize: true,
 };

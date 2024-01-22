@@ -18,6 +18,9 @@ export class PushNotifications {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;
 
+  @Column('int', { name: 'user_id' })
+  UserId: number;
+
   @IsString()
   @IsNotEmpty({ message: '토큰 정보가 없습니다.' })
   @Length(1, 500, { message: '토큰 정보가 없습니다.' })
@@ -38,5 +41,5 @@ export class PushNotifications {
     onUpdate: 'CASCADE',
   })
   @JoinColumn([{ name: 'user_id', referencedColumnName: 'id' }])
-  UserId: number;
+  User: Users;
 }

@@ -1,6 +1,13 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Plans, Plans as PlansRepo } from 'src/entities/Plans';
+import { Plans } from 'src/entities/Plans';
 import { PlanCharts } from 'src/entities/PlanCharts';
 import { DataSource, Repository } from 'typeorm';
 import { CreatePlanChartDto } from './dto/create-plan-chart.dto';
@@ -16,11 +23,12 @@ export class PlanChartsService {
   constructor(
     @InjectRepository(PlanCharts)
     private planChartRepository: Repository<PlanCharts>,
-    @InjectRepository(PlansRepo)
-    private planRepository: Repository<PlansRepo>,
+    @InjectRepository(Plans)
+    private planRepository: Repository<Plans>,
     @InjectRepository(SubPlans)
     private subPlanRepository: Repository<SubPlans>,
     private datasource: DataSource,
+    @Inject(forwardRef(() => PlansService))
     private plansService: PlansService
   ) {}
 
@@ -63,7 +71,7 @@ export class PlanChartsService {
       const planChartReturned = await queryRunner.manager.getRepository(PlanCharts).save(planChart);
       const planPromiseArray = plans.map((plan) => {
         plan.PlanChartId = planChartReturned.id;
-        return queryRunner.manager.getRepository(PlansRepo).save(plan);
+        return queryRunner.manager.getRepository(Plans).save(plan);
       });
       const plansReturned = await Promise.all(planPromiseArray);
 
@@ -131,6 +139,7 @@ export class PlanChartsService {
     if (!planChart) {
       throw new NotFoundException('존재하지 않는 일정표입니다.');
     }
+
     planChart.repeatDates = JSON.parse(planChart.repeatDates);
     planChart.repeats = JSON.parse(planChart.repeats);
     const plans = await this.planRepository
@@ -244,7 +253,7 @@ export class PlanChartsService {
           plan.PlanChartId = planChart.id;
           const { id, updatedAt, removedAt, ...planWithoutId } = plan;
 
-          return queryRunner.manager.getRepository(PlansRepo).save(planWithoutId);
+          return queryRunner.manager.getRepository(Plans).save(planWithoutId);
         })
       );
 
@@ -346,7 +355,7 @@ export class PlanChartsService {
         targetPlanChart.plans.map((plan) => {
           plan.PlanChartId = targetPlanChart.id;
           const { id, updatedAt, removedAt, ...planWithoutId } = plan;
-          return queryRunner.manager.getRepository(PlansRepo).save(planWithoutId);
+          return queryRunner.manager.getRepository(Plans).save(planWithoutId);
         })
       );
 

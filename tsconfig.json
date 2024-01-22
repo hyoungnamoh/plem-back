@@ -25,5 +25,7 @@
     "strictPropertyInitialization": false,
     "noImplicitThis": true,
     "alwaysStrict": true,
+    "moduleResolution": "Node",
+    "resolveJsonModule": true
   }
 }
