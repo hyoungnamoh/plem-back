@@ -154,7 +154,51 @@ export class UsersService {
     }
   }
 
-  async updatePassword({ email, password }: { email: string; password: string }) {
+  async updatePassword({
+    email,
+    currentPassword,
+    newPassword,
+  }: {
+    email: string;
+    currentPassword: string;
+    newPassword: string;
+  }) {
+    if (!email) {
+      throw new BadRequestException('이메일을 입력해 주세요.');
+    }
+    if (!currentPassword || !newPassword) {
+      throw new BadRequestException('비밀번호를 입력해 주세요.');
+    }
+
+    const user = await this.userRepository.findOne({
+      select: ['id', 'password'],
+      where: { email },
+    });
+    if (!user) {
+      throw new NotFoundException('존재하지 않는 이메일입니다.');
+    }
+
+    const match = await bcrypt.compare(currentPassword, user.password);
+    if (!match) {
+      throw new BadRequestException('현재 비밀번호가 일치하지 않습니다.');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    const result = await this.userRepository.update(user.id, {
+      password: hashedPassword,
+    });
+
+    if (result.affected && result.affected < 1) {
+      throw new InternalServerErrorException('정보 수정에 실패했습니다. 잠시후 다시 시도해주세요.');
+    }
+
+    return {
+      id: user.id,
+    };
+  }
+
+  async initPassword({ email, password }: { email: string; password: string }) {
     if (!email) {
       throw new BadRequestException('이메일을 입력해 주세요.');
     }

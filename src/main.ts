@@ -37,9 +37,11 @@ async function bootstrap() {
     clientC509CertUrl: fcmServiceAccountKey.client_x509_cert_url,
   };
 
-  admin.initializeApp({
-    credential: admin.credential.cert(fcmServiceAccount),
-  });
+  if (admin.apps.length === 0) {
+    admin.initializeApp({
+      credential: admin.credential.cert(fcmServiceAccount),
+    });
+  }
 
   dayjs.extend(utc);
   dayjs.extend(timezone);

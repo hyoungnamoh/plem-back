@@ -89,8 +89,14 @@ export class UsersController {
 
   // 비밀번호 변경
   @Put('/password')
-  async updatePassword(@Body() body: { email: string; password: string }) {
+  async updatePassword(@Body() body: { email: string; currentPassword: string; newPassword: string }) {
     return await this.userService.updatePassword(body);
+  }
+
+  // 비밀번호 초기화
+  @Put('/password/init')
+  async initPassword(@Body() body: { email: string; password: string }) {
+    return await this.userService.initPassword(body);
   }
 
   // 이메일 변경
