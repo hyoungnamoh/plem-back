@@ -56,7 +56,7 @@ import { FcmServiceModule } from './fcm/fcm.module';
         return {
           ...config.get('email'),
           template: {
-            dir: path.join(__dirname, '/src/templates/'),
+            dir: path.join(__dirname, '/templates/'),
             adapter: new EjsAdapter(),
             options: {
               strict: true,
