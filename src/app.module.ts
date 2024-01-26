@@ -7,7 +7,7 @@ import { PlansService } from './plans/plans.service';
 import { PlansModule } from './plans/plans.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import ormconfig from 'ormconfig';
+import ormconfig from 'src/ormconfig';
 import { UsersController } from './users/users.controller';
 import { UsersService } from './users/users.service';
 import { Users } from './entities/Users';

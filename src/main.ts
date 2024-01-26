@@ -5,7 +5,7 @@ import { HttpExceptionFilter } from './http-exception.filter';
 import passport from 'passport';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import path from 'path';
-import * as fcmServiceAccountKey from '../fcmServiceAccountKey.json';
+import * as fcmServiceAccountKey from './fcmServiceAccountKey.json';
 import * as admin from 'firebase-admin';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';

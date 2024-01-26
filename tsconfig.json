@@ -16,7 +16,7 @@
     "noFallthroughCasesInSwitch": false,
     "jsx": "react-native",
     "skipLibCheck": true,                                 
-    "allowJs": true,
+    "allowJs": false,
     "esModuleInterop": true,
     "strict": true,
     "strictNullChecks": true,
