@@ -62,7 +62,7 @@ export class PlansService {
   }
 
   async getPhoneTokensByPlan({ startHour, startMin }: { startHour: number; startMin: number }) {
-    const users = await this.userRepository.createQueryBuilder().where('removed_at is null').getMany();
+    const users = await this.userRepository.createQueryBuilder().where('plan_notification = 1').getMany();
     const todayPlanCharts = users.map((user) => {
       return this.planChartService.getTodayPlanChart(user);
     });
