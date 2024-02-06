@@ -46,6 +46,9 @@ export class Users {
   @Column('tinyint', { name: 'is_certified', width: 1, default: () => "'0'" })
   isCertified: boolean;
 
+  @Column('tinyint', { name: 'plan_notifiaction', width: 1, default: () => "'0'" })
+  planNotification: boolean;
+
   @Column('tinyint', { name: 'enabled', width: 1, default: () => "'1'" })
   enabled: boolean;
 
