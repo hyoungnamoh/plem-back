@@ -69,14 +69,15 @@ export class UsersService {
     }
   }
 
-  async deleteUser({ email, password }: Users & { password: string }) {
-    const user = await this.userRepository.findOne({
-      where: { email },
-      select: ['password'],
-    });
+  async deleteUser({ id, email, password }: Users & { password: string }) {
+    const user = await this.userRepository
+      .createQueryBuilder()
+      .select(['id', 'email', 'password'])
+      .where('id = :id and email = :email and removed_at is null', { id, email })
+      .getOne();
 
     if (!user) {
-      throw new UnauthorizedException('존재하지 않는 유저입니다.');
+      throw new NotFoundException('존재하지 않는 유저입니다.');
     }
 
     const result = await bcrypt.compare(password, user.password);
@@ -89,8 +90,12 @@ export class UsersService {
       .createQueryBuilder('user')
       .softDelete()
       .from(Users)
-      .where('user.email = :email', { email })
+      .where('id = :id and email = :email', { id, email })
       .execute();
+
+    return {
+      id,
+    };
   }
 
   async checkDuplicateEmail({ email }: { email: string }) {
@@ -288,6 +293,43 @@ export class UsersService {
       return {
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
+        id: userId,
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async updatePlanNotification({ userId, planNotification }: { userId: number; planNotification: boolean }) {
+    console.log('planNotification2', planNotification);
+
+    const queryRunner = this.datasource.createQueryRunner();
+    try {
+      queryRunner.connect();
+      queryRunner.startTransaction();
+      const user = await this.userRepository
+        .createQueryBuilder('user')
+        .where('id = :userId and removed_at is null', { userId })
+        .getOne();
+
+      if (!user) {
+        throw new BadRequestException('잘못된 요청입니다.');
+      }
+
+      await queryRunner.manager
+        .getRepository(Users)
+        .createQueryBuilder('user')
+        .update(Users)
+        .set({ planNotification })
+        .where('id = :userId', { userId })
+        .execute();
+
+      await queryRunner.commitTransaction();
+
+      return {
         id: userId,
       };
     } catch (error) {

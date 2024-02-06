@@ -7,7 +7,6 @@ import { UserDeco } from 'src/common/decorators/user.decorator';
 import { SuccessResponseInterceptor } from 'src/common/interceptors/successResponse.interceptor';
 import { EmailService } from 'src/email/email.service';
 import { Users } from 'src/entities/Users';
-import { ChangeMyInfoRequestDto } from './dto/change-my-info.request.dto';
 import { SignUpRequestDto } from './dto/sign-up.request.dto';
 import { UsersService } from './users.service';
 
@@ -39,10 +38,10 @@ export class UsersController {
   //   await this.userService.putUser(user, body);
   // }
 
-  @Delete('/delete') // 계정 삭제
+  @Delete() // 계정 삭제
   @UseGuards(JwtAuthGuard)
-  async deleteUser(@UserDeco() user: Users, @Body() body: { password: string }) {
-    await this.userService.deleteUser({ ...user, ...body });
+  deleteUser(@UserDeco() user: Users, @Body() body: { password: string }) {
+    return this.userService.deleteUser({ ...user, ...body });
   }
 
   // 로그인
@@ -74,6 +73,7 @@ export class UsersController {
     return await this.userService.checkDuplicateEmail(query);
   }
 
+  // 로그아웃
   @Post('/logout')
   @UseGuards(JwtAuthGuard)
   async logout(@UserDeco() user: Users, @Body() body: { phoneToken: string }) {
@@ -104,5 +104,14 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   async updateEmail(@Body() body: { newEmail: string }, @UserDeco() user: Users) {
     return await this.userService.updateEmail({ ...body, userId: user.id });
+  }
+
+  // 일정 알림 설정 on/off
+  @Put('/notification/plan')
+  @UseGuards(JwtAuthGuard)
+  async updatePlanNotification(@Body() body: { planNotification: boolean }, @UserDeco() user: Users) {
+    console.log('body', body);
+
+    return await this.userService.updatePlanNotification({ ...body, userId: user.id });
   }
 }
