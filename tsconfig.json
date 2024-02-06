@@ -14,7 +14,6 @@
     "noImplicitAny": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "jsx": "react-native",
     "skipLibCheck": true,                                 
     "allowJs": false,
     "esModuleInterop": true,

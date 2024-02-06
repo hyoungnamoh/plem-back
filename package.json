@@ -20,15 +20,16 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
-    "seed:config": "ts-node ./node_modules/typeorm-seeding/dist/cli.js config",
-    "seed:run": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed",
-    "schema:drop": "ts-node ./node_modules/typeorm/cli.js schema:drop",
-    "schema:sync": "ts-node ./node_modules/typeorm/cli.js schema:sync",
-    "db:migrate": "npm run typeorm migration:run",
-    "db:migrate:revert": "npm run typeorm migration:revert",
-    "db:create-migration": "npm run typeorm migration:create -- -n",
-    "db:generate-migration": "npm run typeorm migration:generate -- -n"
+    "typeorm": "node --require ts-node/register -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
+    "db:create": "ts-node -r tsconfig-paths/register ./node_modules/typeorm-extension/bin/cli.cjs db:create -d ./dataSource.ts",
+    "db:drop": "ts-node -r tsconfig-paths/register ./node_modules/typeorm-extension/bin/cli.cjs db:drop  -d ./dataSource.ts",
+    "seed": "ts-node -r tsconfig-paths/register ./node_modules/typeorm-extension/bin/cli.cjs seed -d ./dataSource.ts",
+    "schema:drop": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js schema:drop -d ./dataSource.ts",
+    "schema:sync": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js schema:sync -d ./dataSource.ts",
+    "db:migrate": "npm run typeorm migration:run -- -d ./dataSource.ts",
+    "db:migrate:revert": "npm run typeorm migration:revert -- -d ./dataSource.ts",
+    "db:create-migration": "npm run typeorm migration:create -- ./src/migrations/",
+    "db:generate-migration": "npm run typeorm migration:generate -- ./src/migrations -d ./dataSource.ts"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.8.1",
@@ -58,7 +59,8 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.5.6",
-    "typeorm": "^0.3.9"
+    "typeorm": "^0.3.9",
+    "typeorm-extension": "^3.4.0"
   },
   "devDependencies": {
     "@nestjs/schematics": "^9.0.3",
@@ -107,6 +109,7 @@
     "testEnvironment": "node"
   },
   "resolutions": {
+    "wrap-ansi": "7.0.0",
     "string-width": "4.2.3"
   }
 }
