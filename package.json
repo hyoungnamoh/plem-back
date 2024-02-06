@@ -26,10 +26,10 @@
     "seed": "ts-node -r tsconfig-paths/register ./node_modules/typeorm-extension/bin/cli.cjs seed -d ./dataSource.ts",
     "schema:drop": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js schema:drop -d ./dataSource.ts",
     "schema:sync": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js schema:sync -d ./dataSource.ts",
-    "db:migrate": "npm run typeorm migration:run -- -d ./dataSource.ts",
-    "db:migrate:revert": "npm run typeorm migration:revert -- -d ./dataSource.ts",
-    "db:create-migration": "npm run typeorm migration:create -- ./src/migrations/",
-    "db:generate-migration": "npm run typeorm migration:generate -- ./src/migrations -d ./dataSource.ts"
+    "db:migrate": "yarn typeorm migration:run -- -d ./dataSource.ts",
+    "db:migrate:revert": "yarn typeorm migration:revert -- -d ./dataSource.ts",
+    "db:create-migration": "yarn typeorm migration:create -- ./src/migrations/",
+    "db:generate-migration": "yarn typeorm migration:generate -- ./src/migrations -d ./dataSource.ts"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.8.1",
