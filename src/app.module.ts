@@ -41,6 +41,10 @@ import { BatchModule } from './batch/batch.module';
 import { FcmModule } from './fcm/fcm.module';
 import { FcmController } from './fcm/fcm.controller';
 import { FcmService } from './fcm/fcm.service';
+import { InquiriesController } from './inquiries/inquiries.controller';
+import { InquiriesModule } from './inquiries/inquiries.module';
+import { InquiriesService } from './inquiries/inquiries.service';
+import { Inquiries } from './entities/Inquiries';
 
 @Module({
   imports: [
@@ -48,7 +52,7 @@ import { FcmService } from './fcm/fcm.service';
     PlansModule,
     UsersModule,
     TypeOrmModule.forRoot(ormconfig),
-    TypeOrmModule.forFeature([Users, Plans, PlanCharts, SubPlans, Schedules, Notices, PushNotifications]),
+    TypeOrmModule.forFeature([Users, Plans, PlanCharts, SubPlans, Schedules, Notices, PushNotifications, Inquiries]),
     AuthModule,
     PlanChartsModule,
     MailerModule.forRootAsync({
@@ -73,6 +77,7 @@ import { FcmService } from './fcm/fcm.service';
     PushNotificationsModule,
     BatchModule,
     FcmModule,
+    InquiriesModule,
   ],
   controllers: [
     AppController,
@@ -84,6 +89,7 @@ import { FcmService } from './fcm/fcm.service';
     PushNotificationsController,
     BatchController,
     FcmController,
+    InquiriesController,
   ],
   providers: [
     AppService,
@@ -96,6 +102,7 @@ import { FcmService } from './fcm/fcm.service';
     NoticeService,
     PushNotificationsService,
     FcmService,
+    InquiriesService,
   ],
 })
 export class AppModule implements NestModule {

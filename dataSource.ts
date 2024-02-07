@@ -7,6 +7,7 @@ import { SubPlans } from 'src/entities/SubPlans';
 import { Schedules } from 'src/entities/Schedules';
 import { Notices } from 'src/entities/Notices';
 import { PushNotifications } from 'src/entities/PushNotifications';
+import { Inquiries } from 'src/entities/Inquiries';
 
 dotenv.config();
 
@@ -18,7 +19,7 @@ const dataSource = new DataSource({
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  entities: [Users, PlanCharts, Plans, SubPlans, Schedules, Notices, PushNotifications],
+  entities: [Users, PlanCharts, Plans, SubPlans, Schedules, Notices, PushNotifications, Inquiries],
   migrations: [__dirname + '/src/migrations/*.ts'],
   synchronize: false,
   logging: true,
