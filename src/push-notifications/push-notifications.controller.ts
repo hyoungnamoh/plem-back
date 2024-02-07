@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Post, UseGuards, UseInterceptors } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UserDeco } from 'src/common/decorators/user.decorator';
 import { Users } from 'src/entities/Users';
@@ -15,6 +15,12 @@ export class PushNotificationsController {
   @UseGuards(JwtAuthGuard)
   async postPushNotification(@Body() body: { phoneToken: PushNotifications['phoneToken'] }, @UserDeco() user: Users) {
     return await this.noticeService.postPushNotification({ ...body, userId: user.id });
+  }
+
+  @Delete('')
+  @UseGuards(JwtAuthGuard)
+  async deletePushNotification(@Body() body: { phoneToken: PushNotifications['phoneToken'] }, @UserDeco() user: Users) {
+    return await this.noticeService.deletePushNotification({ ...body, userId: user.id });
   }
 
   // @Get('')

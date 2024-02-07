@@ -55,23 +55,15 @@ export class PushNotificationsService {
   //   return notice;
   // }
 
-  async deletePushNotification({
-    phoneToken,
-    userId,
-  }: {
-    phoneToken: PushNotifications['phoneToken'];
-    userId: number;
-  }) {
+  async deletePushNotification({ phoneToken, userId }: { phoneToken: string; userId: number }) {
     const pushNotification = await this.pushNotificationsRepository
       .createQueryBuilder('pushNotification')
-      .where(
-        'pushNotification.phoneToken = :phoneToken and pushNotification.user_id = :userId and removed_at is null',
-        { phoneToken, userId }
-      )
+      .where('pushNotification.phoneToken = :phoneToken and pushNotification.user_id = :userId', { phoneToken, userId })
       .getOne();
     if (!pushNotification) {
       throw new NotFoundException('존재하지 않는 토큰입니다.');
     }
+
     await this.pushNotificationsRepository.delete(pushNotification.id);
   }
 }
