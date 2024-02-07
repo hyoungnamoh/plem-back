@@ -38,7 +38,9 @@ import { PushNotificationsController } from './push-notifications/push-notificat
 import { PushNotificationsService } from './push-notifications/push-notifications.service';
 import { BatchController } from './batch/batch.controller';
 import { BatchModule } from './batch/batch.module';
-import { FcmServiceModule } from './fcm/fcm.module';
+import { FcmModule } from './fcm/fcm.module';
+import { FcmController } from './fcm/fcm.controller';
+import { FcmService } from './fcm/fcm.service';
 
 @Module({
   imports: [
@@ -70,7 +72,7 @@ import { FcmServiceModule } from './fcm/fcm.module';
     NoticeModule,
     PushNotificationsModule,
     BatchModule,
-    FcmServiceModule,
+    FcmModule,
   ],
   controllers: [
     AppController,
@@ -81,6 +83,7 @@ import { FcmServiceModule } from './fcm/fcm.module';
     NoticeController,
     PushNotificationsController,
     BatchController,
+    FcmController,
   ],
   providers: [
     AppService,
@@ -92,6 +95,7 @@ import { FcmServiceModule } from './fcm/fcm.module';
     SchedulesService,
     NoticeService,
     PushNotificationsService,
+    FcmService,
   ],
 })
 export class AppModule implements NestModule {

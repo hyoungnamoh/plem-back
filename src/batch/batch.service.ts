@@ -9,9 +9,8 @@ export class BatchService {
   constructor(private readonly fcmService: FcmService, private readonly plansService: PlansService) {}
   private readonly logger = new Logger(BatchService.name);
 
-  @Cron('0 */5 * * * *', { name: 'fcmSendCronTask' })
-  async handleFcmSendCron() {
-    this.logger.log(new Date());
+  @Cron('0 */5 * * * *', { name: 'planNotificationSendCronTask' })
+  async planNotificationSendCron() {
     const current = dayjs();
     const startHour = current.get('hour');
     const startMin = current.get('minute');
