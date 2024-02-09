@@ -50,6 +50,7 @@ export class EmailService {
       templateName: 'signup.ejs',
       context: {
         verificationCode: verificationCode,
+        year: new Date().getFullYear(),
       },
     });
 

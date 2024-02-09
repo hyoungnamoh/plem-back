@@ -45,10 +45,15 @@ import { InquiriesController } from './inquiries/inquiries.controller';
 import { InquiriesModule } from './inquiries/inquiries.module';
 import { InquiriesService } from './inquiries/inquiries.service';
 import { Inquiries } from './entities/Inquiries';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [configEmail] }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
     PlansModule,
     UsersModule,
     TypeOrmModule.forRoot(ormconfig),
