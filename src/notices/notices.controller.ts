@@ -6,7 +6,6 @@ import {
   Param,
   Post,
   Put,
-  Query,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -15,7 +14,6 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UserDeco } from 'src/common/decorators/user.decorator';
 import { Users } from 'src/entities/Users';
-import { UpdateScheduleDto } from 'src/schedules/dto/update-schedule.dto';
 import { CreateNoticeDto } from './create-notices.dto';
 import { NoticeService } from './notices.service';
 import multer from 'multer';
@@ -27,7 +25,7 @@ import { UpdateNoticeDto } from './update-notices.dto';
 try {
   fs.readdirSync('notice-images');
 } catch (error) {
-  console.error('notice-images 폴더가 없어 notice-images 폴더를 생성합니다.');
+  console.info('notice-images 폴더가 없어 notice-images 폴더를 생성합니다.');
   fs.mkdirSync('notice-images');
 }
 

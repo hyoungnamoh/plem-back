@@ -10,11 +10,16 @@ import * as admin from 'firebase-admin';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
+import { winstonLogger } from './logger/winston.config';
 
 declare const module: any;
 
 async function bootstrap() {
+  dayjs.extend(utc);
+  dayjs.extend(timezone);
+  dayjs.tz.setDefault('Asia/Seoul');
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.useLogger(winstonLogger);
   const port = process.env.PORT || 3000;
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(
@@ -43,10 +48,6 @@ async function bootstrap() {
     });
   }
 
-  dayjs.extend(utc);
-  dayjs.extend(timezone);
-  dayjs.tz.setDefault('Asia/Seoul');
-
   if (process.env.NODE_ENV === 'production') {
     // 수정 필요
     app.enableCors({ origin: ['https://'], credentials: true });
@@ -59,12 +60,12 @@ async function bootstrap() {
   });
 
   process.on('uncaughtException', (err) => {
-    console.info(err);
+    winstonLogger.error(`uncaughtException! ${err}`);
     process.exit(1);
   });
 
   await app.listen(port);
-  console.info(`listening on port ${port}`);
+  winstonLogger.log(`listening on port ${port}`);
 
   if (module.hot) {
     module.hot.accept();

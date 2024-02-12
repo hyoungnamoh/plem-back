@@ -286,7 +286,6 @@ export class PlanChartsService {
         .set({ name, repeatDates: JSON.stringify(repeatDates), repeats: JSON.stringify(repeats) })
         .where('id = :id and removed_at is null', { id })
         .execute();
-      console.log(dd);
 
       await queryRunner.commitTransaction();
       // return planChartReturned;

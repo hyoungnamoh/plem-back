@@ -110,8 +110,6 @@ export class UsersController {
   @Put('/notification/plan')
   @UseGuards(JwtAuthGuard)
   async updatePlanNotification(@Body() body: { planNotification: boolean }, @UserDeco() user: Users) {
-    console.log('body', body);
-
     return await this.userService.updatePlanNotification({ ...body, userId: user.id });
   }
 }

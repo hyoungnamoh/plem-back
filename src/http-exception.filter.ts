@@ -1,8 +1,9 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, Logger } from '@nestjs/common';
 import { Request, Response } from 'express';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger('NoticeService');
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -14,12 +15,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     // class validator error
     if (typeof err !== 'string') {
+      this.logger.error(`HttpExceptionFilter validator: ${err.statusCode} ${err.message}`);
       return response.status(status).json({
         success: false,
         status: status,
         data: Array.isArray(err.message) && err.message.length > 0 ? err.message[0] : err.message,
       });
     }
+    this.logger.error(`HttpExceptionFilter: ${err}`);
     // 내가 발생시킨 에러 ex) 이메일 중복체크
     response.status(status).json({ success: false, status: status, data: err });
   }

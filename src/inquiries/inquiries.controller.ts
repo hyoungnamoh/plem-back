@@ -16,7 +16,6 @@ export class InquiriesController {
     body: CreateInquiryDto,
     @UserDeco() user: Users
   ) {
-    console.log('?');
     return await this.inquiryService.postInquiry({ ...body, userId: user.id });
   }
 }

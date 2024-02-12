@@ -304,8 +304,6 @@ export class UsersService {
   }
 
   async updatePlanNotification({ userId, planNotification }: { userId: number; planNotification: boolean }) {
-    console.log('planNotification2', planNotification);
-
     const queryRunner = this.datasource.createQueryRunner();
     try {
       queryRunner.connect();

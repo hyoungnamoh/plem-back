@@ -1,9 +1,11 @@
-import { ExecutionContext, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ExecutionContext, HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
+  private readonly logger = new Logger('JwtAuthGuard');
+
   constructor(private jwtService: JwtService) {
     super();
   }
@@ -26,7 +28,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
       return verify;
     } catch (e: any) {
-      console.info('validateToken', e);
+      this.logger.log(`JwtAuthGuard validateToken ${token}: ${e.message}`);
       switch (e.message) {
         // 토큰에 대한 오류를 판단합니다.
         case 'invalid token':

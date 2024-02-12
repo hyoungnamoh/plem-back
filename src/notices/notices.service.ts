@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Notices } from 'src/entities/Notices';
 import { DataSource, Repository } from 'typeorm';
@@ -7,6 +7,7 @@ import { UpdateNoticeDto } from './update-notices.dto';
 
 @Injectable()
 export class NoticeService {
+  private readonly logger = new Logger('NoticeService');
   constructor(
     @InjectRepository(Notices)
     private noticeRepository: Repository<Notices>,
@@ -80,13 +81,13 @@ export class NoticeService {
       .execute();
 
     if (result.affected === 0) {
-      console.info('공지사항 조회수 증가 실패');
+      this.logger.error(`NoticeService increaseViewCount 공지사항 조회수 증가 실패`);
     }
 
     await queryRunner.commitTransaction();
   }
 
-  async updateNotice({ contents, title, userId, id }: UpdateNoticeDto & { userId: number }) {
+  async updateNotice({ contents, title, id }: UpdateNoticeDto & { userId: number }) {
     const queryRunner = this.datasource.createQueryRunner();
     queryRunner.connect();
     queryRunner.startTransaction();
