@@ -90,8 +90,16 @@ export class SchedulesService {
 
     noRepeatSchedules.map((schedule) => {
       const startDate = dayjs(schedule.startDate);
-
-      noRepeatScheduleMap[startDate.get('year')][startDate.get('month')][startDate.get('date')].push(schedule);
+      const endDate = dayjs(schedule.endDate);
+      const sameDate = startDate.isSame(endDate, 'day');
+      if (sameDate) {
+        noRepeatScheduleMap[startDate.get('year')][startDate.get('month')][startDate.get('date')].push(schedule);
+        return;
+      } else {
+        for (let date = startDate; date.isBefore(endDate); date = date.add(1, 'day')) {
+          noRepeatScheduleMap[date.get('year')][date.get('month')][date.get('date')].push(schedule);
+        }
+      }
     });
 
     return noRepeatScheduleMap;
