@@ -70,6 +70,6 @@ export class Users {
   @OneToMany(() => Schedules, (schedules) => schedules.User)
   Schedules: Schedules;
 
-  @OneToMany(() => PushNotifications, (pushNotifications) => pushNotifications.UserId)
-  PushNotifications: PushNotifications;
+  @OneToMany(() => PushNotifications, (pushNotifications) => pushNotifications.User)
+  PushNotifications: PushNotifications[];
 }

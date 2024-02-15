@@ -11,13 +11,15 @@ import { PlanCharts } from 'src/entities/PlanCharts';
 import { PlanChartsService } from 'src/plan-charts/plan-charts.service';
 import { Users } from 'src/entities/Users';
 import { PushNotifications } from 'src/entities/PushNotifications';
+import { SchedulesService } from 'src/schedules/schedules.service';
+import { Schedules } from 'src/entities/Schedules';
 
 @Module({
   imports: [
     NestScheduleModule.forRoot(),
-    TypeOrmModule.forFeature([PlanCharts, Plans, SubPlans, Users, PushNotifications]),
+    TypeOrmModule.forFeature([PlanCharts, Plans, SubPlans, Users, PushNotifications, Schedules]),
   ],
-  providers: [BatchService, FcmService, PlansService, PlanChartsService],
+  providers: [BatchService, FcmService, PlansService, PlanChartsService, SchedulesService],
   controllers: [BatchController],
 })
 export class BatchModule {}

@@ -194,4 +194,24 @@ export class SchedulesService {
 
     await this.scheduleRepository.delete(id);
   }
+
+  async getPhoneTokensBySchedule({ date }: { date: string }) {
+    const schedulesWithUser = await this.scheduleRepository
+      .createQueryBuilder('schedule')
+      .innerJoin('schedule.User', 'user')
+      .innerJoin('user.PushNotifications', 'pushNotifications')
+      .where('user.plan_notification = 1')
+      .andWhere('schedule.start_date = DATE_ADD(:date, INTERVAL schedule.notification MINUTE)', { date })
+      .select(['schedule', 'user', 'pushNotifications'])
+      .getMany();
+
+    const schedulesWithPhoneTokens = schedulesWithUser.map((schedule) => {
+      return {
+        scheduleName: schedule.name,
+        phoneTokens: schedule.User.PushNotifications.map((pushNotification) => pushNotification.phoneToken),
+        notification: schedule.notification,
+      };
+    });
+    return schedulesWithPhoneTokens;
+  }
 }
