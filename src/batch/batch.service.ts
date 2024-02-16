@@ -33,16 +33,23 @@ export class BatchService {
       date: current.format('YYYY-MM-DD HH:mm:ss'),
     });
 
+    const getScheduleFcmContent = (target: {
+      scheduleName: string;
+      phoneTokens: string[];
+      notification: number | null;
+    }) => {
+      if (target.notification === 0) {
+        return `${target.scheduleName} 일정 시간이에요!`;
+      }
+      if (target.notification === 60) {
+        return `${target.scheduleName} 일정이 1시간 뒤 예정되어 있어요!`;
+      }
+      return `${target.scheduleName} 일정이 ${target.notification}분 뒤 예정되어 있어요!`;
+    };
+
     schedulesWithPhoneTokens.forEach((target) => {
       target.phoneTokens.forEach((phoneToken) => {
-        this.fcmService.fcm(
-          phoneToken,
-          '플렘',
-          `${target.scheduleName} 일정이 ${
-            target.notification !== 60 ? `${target.notification}분 뒤` : '1시간 뒤'
-          } 예정되어 있어요!`,
-          'schedule'
-        );
+        this.fcmService.fcm(phoneToken, '플렘', getScheduleFcmContent(target), 'schedule');
       });
     });
   }
