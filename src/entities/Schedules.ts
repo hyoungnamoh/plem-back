@@ -40,7 +40,7 @@ export class Schedules {
 
   @IsIn([null, '0', '5', '10', '15', '30', '60'], { message: invalidErrorMessage })
   @Column('varchar', { name: 'notification', length: 100, nullable: true })
-  notification: number | null;
+  notification: string | null;
 
   @IsIn([null, 'every', 'week', 'twoWeeks', 'month', 'year', 'custom'], { message: invalidErrorMessage })
   @Column('varchar', { name: 'repeats', length: 100, nullable: true })

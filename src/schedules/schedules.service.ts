@@ -196,16 +196,48 @@ export class SchedulesService {
   }
 
   async getPhoneTokensBySchedule({ date }: { date: string }) {
+    const targetDate = dayjs(date);
+    const targetMonth = targetDate.get('month');
+    const targetHour = targetDate.get('hour');
+    const targetMin = targetDate.get('minute');
+    const targetDay = targetDate.get('day');
+    const targetDayOfMonth = targetDate.get('date');
+
     const schedulesWithUser = await this.scheduleRepository
       .createQueryBuilder('schedule')
       .innerJoin('schedule.User', 'user')
       .innerJoin('user.PushNotifications', 'pushNotifications')
       .where('user.plan_notification = 1')
-      .andWhere('schedule.start_date = DATE_ADD(:date, INTERVAL schedule.notification MINUTE)', { date })
+      .andWhere('schedule.notification is not null')
+      .andWhere(':date BETWEEN DATE_SUB(:date, INTERVAL schedule.notification MINUTE) AND schedule.end_date', { date })
+      // .andWhere('schedule.start_date = DATE_ADD(:date, INTERVAL schedule.notification MINUTE)', { date })
       .select(['schedule', 'user', 'pushNotifications'])
       .getMany();
 
-    const schedulesWithPhoneTokens = schedulesWithUser.map((schedule) => {
+    const filteredSchedules = schedulesWithUser.filter((schedule) => {
+      const scheduleDate = dayjs(schedule.startDate).subtract(Number(schedule.notification), 'minute');
+      const scheduleMonth = scheduleDate.get('month');
+      const scheduleHour = scheduleDate.get('hour');
+      const scheduleMin = scheduleDate.get('minute');
+      const scheduleDay = scheduleDate.get('day');
+      const scheduleDayOfMonth = scheduleDate.get('date');
+      const dateDiff = targetDate.diff(scheduleDate) / 1000 / 24 / 60 / 60;
+
+      const isSameTime = targetHour === scheduleHour && targetMin === scheduleMin;
+      const isSameDay = targetDay === scheduleDay;
+      const isSameDayOfMonth = targetDayOfMonth === scheduleDayOfMonth;
+      const isSameMonth = targetMonth === scheduleMonth;
+
+      const everyCondition = schedule.repeats === 'every' && isSameTime;
+      const weekCondition = schedule.repeats === 'week' && isSameDay;
+      const twoWeeksCondition = schedule.repeats === 'twoWeeks' && (dateDiff === 0 || dateDiff % 14 === 0);
+      const monthCondition = schedule.repeats === 'month' && isSameDayOfMonth;
+      const yearCondition = schedule.repeats === 'year' && isSameMonth && isSameDayOfMonth;
+
+      return everyCondition || weekCondition || twoWeeksCondition || monthCondition || yearCondition;
+    });
+
+    const schedulesWithPhoneTokens = filteredSchedules.map((schedule) => {
       return {
         scheduleName: schedule.name,
         phoneTokens: schedule.User.PushNotifications.map((pushNotification) => pushNotification.phoneToken),
