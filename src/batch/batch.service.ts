@@ -31,6 +31,7 @@ export class BatchService {
     const current = dayjs().startOf('minute');
     const schedulesWithPhoneTokens = await this.scheduleService.getPhoneTokensBySchedule({
       date: current.format('YYYY-MM-DD HH:mm:ss'),
+      // date: '2024-03-16 23:55:00',
     });
 
     const getScheduleFcmContent = (target: {

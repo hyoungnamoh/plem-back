@@ -196,7 +196,7 @@ export class SchedulesService {
   }
 
   async getPhoneTokensBySchedule({ date }: { date: string }) {
-    const targetDate = dayjs(date);
+    const targetDate = dayjs(date).startOf('minute');
     const targetMonth = targetDate.get('month');
     const targetHour = targetDate.get('hour');
     const targetMin = targetDate.get('minute');
@@ -215,27 +215,29 @@ export class SchedulesService {
       .getMany();
 
     const filteredSchedules = schedulesWithUser.filter((schedule) => {
-      const scheduleDate = dayjs(schedule.startDate).subtract(Number(schedule.notification), 'minute');
+      const scheduleDate = dayjs(schedule.startDate)
+        .startOf('minute')
+        .subtract(Number(schedule.notification), 'minute');
       const scheduleMonth = scheduleDate.get('month');
       const scheduleHour = scheduleDate.get('hour');
       const scheduleMin = scheduleDate.get('minute');
       const scheduleDay = scheduleDate.get('day');
       const scheduleDayOfMonth = scheduleDate.get('date');
       const dateDiff = targetDate.diff(scheduleDate) / 1000 / 24 / 60 / 60;
-
       const isSameTime = targetHour === scheduleHour && targetMin === scheduleMin;
       const isSameDay = targetDay === scheduleDay;
       const isSameDayOfMonth = targetDayOfMonth === scheduleDayOfMonth;
       const isSameMonth = targetMonth === scheduleMonth;
 
       const everyCondition = schedule.repeats === 'every' && isSameTime;
-      const weekCondition = schedule.repeats === 'week' && isSameDay;
+      const weekCondition = schedule.repeats === 'week' && isSameDay && isSameTime;
       const twoWeeksCondition = schedule.repeats === 'twoWeeks' && (dateDiff === 0 || dateDiff % 14 === 0);
       const monthCondition = schedule.repeats === 'month' && isSameDayOfMonth;
       const yearCondition = schedule.repeats === 'year' && isSameMonth && isSameDayOfMonth;
 
       return everyCondition || weekCondition || twoWeeksCondition || monthCondition || yearCondition;
     });
+    console.log(filteredSchedules);
 
     const schedulesWithPhoneTokens = filteredSchedules.map((schedule) => {
       return {
