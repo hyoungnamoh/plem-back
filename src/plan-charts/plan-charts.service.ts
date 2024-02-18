@@ -37,9 +37,27 @@ export class PlanChartsService {
     queryRunner.connect();
     queryRunner.startTransaction();
     const planChart = new PlanCharts();
+
     try {
+      const planChartCount = await this.planChartRepository
+        .createQueryBuilder('chart')
+        .where('chart.UserId = :userId and chart.removed_at is null', { userId })
+        .getCount();
+
+      const duplicatedPlanChart = await this.planChartRepository
+        .createQueryBuilder('chart')
+        .where('chart.name = :name and chart.UserId = :userId and chart.removed_at is null', { name, userId })
+        .getOne();
+
+      if (duplicatedPlanChart) {
+        throw new BadRequestException('계획표 이름이 중복됩니다. 계획표 이름을 변경해주세요.');
+      }
+
+      if (planChartCount >= 10) {
+        throw new BadRequestException('계획표는 최대 10개까지 생성할 수 있습니다.');
+      }
       if (repeats.includes(7) && repeatDates.length === 0) {
-        throw new BadRequestException('반복 선택일이 없습니다.');
+        throw new BadRequestException('반복일을 선택해주세요.');
       }
 
       const duplicatedRepeatChart = await this.checkDuplicatedRepeatDay({

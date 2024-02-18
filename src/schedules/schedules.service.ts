@@ -237,7 +237,6 @@ export class SchedulesService {
 
       return everyCondition || weekCondition || twoWeeksCondition || monthCondition || yearCondition;
     });
-    console.log(filteredSchedules);
 
     const schedulesWithPhoneTokens = filteredSchedules.map((schedule) => {
       return {
