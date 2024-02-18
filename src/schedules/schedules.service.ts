@@ -231,9 +231,10 @@ export class SchedulesService {
 
       const everyCondition = schedule.repeats === 'every' && isSameTime;
       const weekCondition = schedule.repeats === 'week' && isSameDay && isSameTime;
-      const twoWeeksCondition = schedule.repeats === 'twoWeeks' && (dateDiff === 0 || dateDiff % 14 === 0);
-      const monthCondition = schedule.repeats === 'month' && isSameDayOfMonth;
-      const yearCondition = schedule.repeats === 'year' && isSameMonth && isSameDayOfMonth;
+      const twoWeeksCondition =
+        schedule.repeats === 'twoWeeks' && (dateDiff === 0 || dateDiff % 14 === 0) && isSameTime;
+      const monthCondition = schedule.repeats === 'month' && isSameDayOfMonth && isSameTime;
+      const yearCondition = schedule.repeats === 'year' && isSameMonth && isSameDayOfMonth && isSameTime;
 
       return everyCondition || weekCondition || twoWeeksCondition || monthCondition || yearCondition;
     });
@@ -246,5 +247,53 @@ export class SchedulesService {
       };
     });
     return schedulesWithPhoneTokens;
+  }
+
+  async getTodaySchedule({ userId, date }: { userId: number; date: string }) {
+    const targetDate = dayjs(date).startOf('minute');
+    const targetMonth = targetDate.get('month');
+    const targetDay = targetDate.get('day');
+    const targetDayOfMonth = targetDate.get('date');
+    const noRepeatTodaySchedules = await this.scheduleRepository
+      .createQueryBuilder('schedule')
+      .where(
+        'schedule.UserId = :userId and schedule.removed_at is null and DATE(start_date) = :date and schedule.repeats is null',
+        {
+          userId,
+          date,
+        }
+      )
+      .getMany();
+    const repeatTodaySchedules = await this.scheduleRepository
+      .createQueryBuilder('schedule')
+      .where(
+        'schedule.UserId = :userId and schedule.removed_at is null and DATE(start_date) = :date and schedule.repeats is not null',
+        {
+          userId,
+          date,
+        }
+      )
+      .getMany();
+
+    const filteredRepeatTodaySchedules = repeatTodaySchedules.filter((schedule) => {
+      const scheduleDate = dayjs(schedule.startDate).startOf('minute');
+      const scheduleMonth = scheduleDate.get('month');
+      const scheduleDay = scheduleDate.get('day');
+      const scheduleDayOfMonth = scheduleDate.get('date');
+      const dateDiff = targetDate.diff(scheduleDate) / 1000 / 24 / 60 / 60;
+      const isSameDay = targetDay === scheduleDay;
+      const isSameDayOfMonth = targetDayOfMonth === scheduleDayOfMonth;
+      const isSameMonth = targetMonth === scheduleMonth;
+
+      const everyCondition = schedule.repeats === 'every';
+      const weekCondition = schedule.repeats === 'week' && isSameDay;
+      const twoWeeksCondition = schedule.repeats === 'twoWeeks' && (dateDiff === 0 || dateDiff % 14 === 0);
+      const monthCondition = schedule.repeats === 'month' && isSameDayOfMonth;
+      const yearCondition = schedule.repeats === 'year' && isSameMonth && isSameDayOfMonth;
+
+      return everyCondition || weekCondition || twoWeeksCondition || monthCondition || yearCondition;
+    });
+
+    return noRepeatTodaySchedules.concat(filteredRepeatTodaySchedules);
   }
 }

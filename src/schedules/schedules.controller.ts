@@ -39,4 +39,11 @@ export class SchedulesController {
   deleteSchedule(@Param() param: { id: number }, @UserDeco() user: Users) {
     return this.schedulesService.deleteSchedule({ ...param, userId: user.id });
   }
+
+  // 오늘 일정 가져오기
+  @Get('/today')
+  @UseGuards(JwtAuthGuard)
+  getTodaySchedule(@Query() param: { date: string }, @UserDeco() user: Users) {
+    return this.schedulesService.getTodaySchedule({ ...param, userId: user.id });
+  }
 }
