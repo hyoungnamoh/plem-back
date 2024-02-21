@@ -457,4 +457,13 @@ export class PlanChartsService {
       return typeof repeats.find((repeat) => newChartRepeats.includes(repeat)) === 'number';
     });
   }
+
+  async getPlanChartsCount({ userId }) {
+    const count = await this.planChartRepository
+      .createQueryBuilder('chart')
+      .where('chart.UserId = :userId and chart.removed_at is null', { userId })
+      .getCount();
+
+    return { count };
+  }
 }

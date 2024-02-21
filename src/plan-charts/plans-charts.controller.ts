@@ -38,6 +38,13 @@ export class PlanChartsController {
     return this.planChartService.getTodayPlanChart(user);
   }
 
+  // 계획표 갯수 가져오기
+  @Get('/count')
+  @UseGuards(JwtAuthGuard)
+  getPlanChartsCount(@Query() query: { page: number }, @UserDeco() user: Users) {
+    return this.planChartService.getPlanChartsCount({ ...query, userId: user.id });
+  }
+
   // 계획표 가져오기
   @Get('/:id')
   @UseGuards(JwtAuthGuard)
