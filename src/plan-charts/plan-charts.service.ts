@@ -363,6 +363,15 @@ export class PlanChartsService {
     queryRunner.startTransaction();
 
     try {
+      const planChartCount = await this.planChartRepository
+        .createQueryBuilder('chart')
+        .where('chart.UserId = :userId and chart.removed_at is null', { userId: user.id })
+        .getCount();
+
+      if (planChartCount >= 10) {
+        throw new BadRequestException('계획표는 최대 10개까지 생성할 수 있습니다.');
+      }
+
       const targetPlanChart = await this.getPlanChart(body, user);
       if (!targetPlanChart) {
         throw new NotFoundException('존재하지 않는 일정표입니다.');
