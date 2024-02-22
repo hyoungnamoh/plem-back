@@ -7,6 +7,7 @@ import { UserDeco } from 'src/common/decorators/user.decorator';
 import { SuccessResponseInterceptor } from 'src/common/interceptors/successResponse.interceptor';
 import { EmailService } from 'src/email/email.service';
 import { Users } from 'src/entities/Users';
+import { DeleteUserDto } from './dto/delete-user.dto';
 import { SignUpRequestDto } from './dto/sign-up.request.dto';
 import { UsersService } from './users.service';
 
@@ -40,7 +41,7 @@ export class UsersController {
 
   @Delete() // 계정 삭제
   @UseGuards(JwtAuthGuard)
-  deleteUser(@UserDeco() user: Users, @Body() body: { password: string }) {
+  deleteUser(@UserDeco() user: Users, @Body() body: DeleteUserDto) {
     return this.userService.deleteUser({ ...user, ...body });
   }
 

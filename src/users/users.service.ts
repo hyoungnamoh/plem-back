@@ -13,6 +13,8 @@ import { SignUpRequestDto } from './dto/sign-up.request.dto';
 import bcrypt from 'bcrypt';
 import { ChangeMyInfoRequestDto } from './dto/change-my-info.request.dto';
 import { AuthService } from 'src/auth/auth.service';
+import { DeleteUserDto } from './dto/delete-user.dto';
+import { WithdrawalReasonsService } from 'src/withdrawal-reasons/withdrawal-reasons.service';
 @Injectable()
 export class UsersService {
   // service(business logic)는 repo(이어주는 역할)를 통해 entitiy(table)에 쿼리를 날림
@@ -20,7 +22,8 @@ export class UsersService {
     @InjectRepository(Users)
     private userRepository: Repository<Users>,
     private datasource: DataSource,
-    private authService: AuthService
+    private authService: AuthService,
+    private withdrawalReasonServive: WithdrawalReasonsService
   ) {}
 
   async signUp({ email, password, nickname }: SignUpRequestDto) {
@@ -69,33 +72,52 @@ export class UsersService {
     }
   }
 
-  async deleteUser({ id, email, password }: Users & { password: string }) {
-    const user = await this.userRepository
-      .createQueryBuilder()
-      .select(['id', 'email', 'password'])
-      .where('id = :id and email = :email and removed_at is null', { id, email })
-      .getOne();
+  async deleteUser({ id, email, reason, type }: Users & DeleteUserDto) {
+    const queryRunner = this.datasource.createQueryRunner();
+    try {
+      queryRunner.connect();
+      queryRunner.startTransaction();
 
-    if (!user) {
-      throw new NotFoundException('존재하지 않는 유저입니다.');
+      if (!id || !email) {
+        throw new NotFoundException('유저 정보가 없습니다. 재로그인 후 다시 시도해주세요.');
+      }
+
+      const user = await this.userRepository
+        .createQueryBuilder()
+        .where('id = :id and email = :email and removed_at is null', { id, email })
+        .getOne();
+
+      if (!user) {
+        throw new NotFoundException('존재하지 않는 유저입니다.');
+      }
+
+      await this.withdrawalReasonServive.postWithdrawalReason({
+        reason,
+        type,
+        userId: id,
+      });
+
+      await queryRunner.manager
+        .getRepository(Users)
+        .createQueryBuilder('user')
+        .softDelete()
+        .from(Users)
+        .where('id = :id and email = :email', { id, email })
+        .execute();
+
+      await queryRunner.commitTransaction();
+
+      return { id };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
 
-    const result = await bcrypt.compare(password, user.password);
-
-    if (!result) {
-      throw new UnauthorizedException('비밀번호가 일치하지 않습니다');
-    }
-
-    await this.userRepository
-      .createQueryBuilder('user')
-      .softDelete()
-      .from(Users)
-      .where('id = :id and email = :email', { id, email })
-      .execute();
-
-    return {
-      id,
-    };
+    // return {
+    //   id,
+    // };
   }
 
   async checkDuplicateEmail({ email }: { email: string }) {

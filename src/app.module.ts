@@ -47,6 +47,10 @@ import { InquiriesService } from './inquiries/inquiries.service';
 import { Inquiries } from './entities/Inquiries';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { WithdrwalReasons } from './entities/WithdrwalReasons';
+import { WithdrawalReasonsModule } from './withdrawal-reasons/withdrawal-reasons.module';
+import { WithdrawalReasonsController } from './withdrawal-reasons/withdrawal-reasons.controller';
+import { WithdrawalReasonsService } from './withdrawal-reasons/withdrawal-reasons.service';
 
 @Module({
   imports: [
@@ -57,7 +61,17 @@ import { join } from 'path';
     PlansModule,
     UsersModule,
     TypeOrmModule.forRoot(ormconfig),
-    TypeOrmModule.forFeature([Users, Plans, PlanCharts, SubPlans, Schedules, Notices, PushNotifications, Inquiries]),
+    TypeOrmModule.forFeature([
+      Users,
+      Plans,
+      PlanCharts,
+      SubPlans,
+      Schedules,
+      Notices,
+      PushNotifications,
+      Inquiries,
+      WithdrwalReasons,
+    ]),
     AuthModule,
     PlanChartsModule,
     MailerModule.forRootAsync({
@@ -83,6 +97,7 @@ import { join } from 'path';
     BatchModule,
     FcmModule,
     InquiriesModule,
+    WithdrawalReasonsModule,
   ],
   controllers: [
     AppController,
@@ -95,6 +110,7 @@ import { join } from 'path';
     BatchController,
     FcmController,
     InquiriesController,
+    WithdrawalReasonsController,
   ],
   providers: [
     AppService,
@@ -108,6 +124,7 @@ import { join } from 'path';
     PushNotificationsService,
     FcmService,
     InquiriesService,
+    WithdrawalReasonsService,
   ],
 })
 export class AppModule implements NestModule {

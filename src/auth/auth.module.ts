@@ -9,6 +9,8 @@ import { JwtStrategy } from './jwt.strategy';
 import { LocalStrategy } from './local.strategy';
 import { PushNotifications } from 'src/entities/PushNotifications';
 import { PushNotificationsService } from 'src/push-notifications/push-notifications.service';
+import { WithdrawalReasonsService } from 'src/withdrawal-reasons/withdrawal-reasons.service';
+import { WithdrwalReasons } from 'src/entities/WithdrwalReasons';
 
 @Module({
   imports: [
@@ -17,9 +19,16 @@ import { PushNotificationsService } from 'src/push-notifications/push-notificati
       secret: process.env.SECRET,
       signOptions: { expiresIn: process.env.ACCESS_EXPIRES_IN },
     }),
-    TypeOrmModule.forFeature([Users, PushNotifications]),
+    TypeOrmModule.forFeature([Users, PushNotifications, WithdrwalReasons]),
   ],
-  providers: [AuthService, UsersService, JwtStrategy, LocalStrategy, PushNotificationsService],
+  providers: [
+    AuthService,
+    UsersService,
+    JwtStrategy,
+    LocalStrategy,
+    PushNotificationsService,
+    WithdrawalReasonsService,
+  ],
   exports: [JwtModule, AuthService, PushNotificationsService],
 })
 export class AuthModule {}
