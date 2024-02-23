@@ -42,8 +42,8 @@ export class Inquiries {
 
   @IsString()
   @IsNotEmpty({ message: '문의 내용을 입력해주세요.' })
-  @Length(1, 100, { message: '문의 내용을 입력해주세요.' })
-  @Column('varchar', { name: 'content', length: 500 })
+  @Length(1, 1000, { message: '1~1000 글자 내로 입력해주세요.' })
+  @Column('varchar', { name: 'content', length: 1000 })
   content: string;
 
   @CreateDateColumn()
