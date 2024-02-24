@@ -9,7 +9,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Plans } from 'src/entities/Plans';
 import { PlanCharts } from 'src/entities/PlanCharts';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, IsNull, Like, Not, Repository } from 'typeorm';
 import { CreatePlanChartDto } from './dto/create-plan-chart.dto';
 import { UpdatePlanChartDto } from './dto/update-plan-chart.dto';
 import { SubPlans } from 'src/entities/SubPlans';
@@ -297,7 +297,7 @@ export class PlanChartsService {
       planChart.repeats = JSON.stringify(repeats);
       planChart.repeatDates = JSON.stringify(repeatDates);
 
-      const dd = await queryRunner.manager
+      await queryRunner.manager
         .getRepository(PlanCharts)
         .createQueryBuilder()
         .update(PlanCharts)
@@ -306,7 +306,7 @@ export class PlanChartsService {
         .execute();
 
       await queryRunner.commitTransaction();
-      // return planChartReturned;
+      return { id };
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -398,7 +398,28 @@ export class PlanChartsService {
         })
       );
 
-      targetPlanChart.name = targetPlanChart.name + ' Copy';
+      const clonedPlanCharts = await queryRunner.manager.getRepository(PlanCharts).find({
+        where: { name: Like(`복사된 계획표%`), removedAt: IsNull() },
+      });
+
+      const numberedPlanChart = clonedPlanCharts.filter((chart) => /^복사된 계획표\s\d+$/.test(chart.name));
+
+      if (clonedPlanCharts.length === 0) {
+        targetPlanChart.name = '복사된 계획표';
+      } else if (clonedPlanCharts.length === 1) {
+        targetPlanChart.name = '복사된 계획표 1';
+      } else if (numberedPlanChart.length > 0) {
+        const latestNumberedPlanChart = numberedPlanChart
+          .map((chart) => Number(chart.name.split(' ')[2]))
+          .sort((a, b) => a - b)
+          .at(-1);
+        if (latestNumberedPlanChart) {
+          targetPlanChart.name = `복사된 계획표 ${latestNumberedPlanChart + 1}`;
+        }
+      } else {
+        targetPlanChart.name = '복사된 계획표';
+      }
+
       const { id, removedAt, updatedAt, ...copiedPlanChart } = targetPlanChart;
 
       copiedPlanChart.repeatDates = JSON.stringify([]);
