@@ -400,7 +400,7 @@ export class PlanChartsService {
       );
 
       const clonedPlanCharts = await queryRunner.manager.getRepository(PlanCharts).find({
-        where: { name: Like(`복사된 계획표%`), removedAt: IsNull() },
+        where: { name: Like(`복사된 계획표%`), removedAt: IsNull(), UserId: user.id },
       });
 
       const numberedPlanChart = clonedPlanCharts.filter((chart) => /^복사된 계획표\s\d+$/.test(chart.name));
