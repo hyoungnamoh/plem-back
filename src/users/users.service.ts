@@ -31,9 +31,15 @@ export class UsersService {
       where: { email },
       withDeleted: true,
     });
-    if (user) {
-      throw new HttpException('이미 사용중인 이메일입니다!', 400);
+
+    if (user && user.removedAt) {
+      throw new BadRequestException('탈퇴 처리된 이메일로 사용이 불가능합니다.');
     }
+
+    if (user && !user.removedAt) {
+      throw new BadRequestException('이미 사용중인 이메일 입니다.');
+    }
+
     const hashedPassword = await bcrypt.hash(password, 12);
 
     await this.userRepository.save({
@@ -123,9 +129,14 @@ export class UsersService {
   async checkDuplicateEmail({ email }: { email: string }) {
     const user = await this.userRepository.createQueryBuilder('user').where('user.email = :email', { email }).getOne();
 
+    if (user && user.removedAt) {
+      throw new BadRequestException('탈퇴 처리된 이메일로 사용이 불가능합니다.');
+    }
+
     if (user && !user.removedAt) {
       throw new BadRequestException('이미 사용중인 이메일 입니다.');
     }
+
     return true;
   }
 
