@@ -56,6 +56,7 @@ export class PlanChartsService {
       if (planChartCount >= 10) {
         throw new BadRequestException('계획표는 최대 10개까지 생성할 수 있습니다.');
       }
+
       if (repeats.includes(7) && repeatDates.length === 0) {
         throw new BadRequestException('반복일을 선택해주세요.');
       }

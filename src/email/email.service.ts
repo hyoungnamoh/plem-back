@@ -36,7 +36,7 @@ export class EmailService {
       await this.usersService.checkDuplicateEmail({ email });
     } else {
       const user = await this.usersService.getUserFromEmail({ email });
-      if (!user || user.removedAt) throw new NotFoundException('존재하지 않는 이메일입니다.');
+      if (!user || user.removedAt) throw new NotFoundException('가입되지 않은 이메일입니다.');
     }
 
     const verificationCode = Math.floor(100000 + Math.random() * 900000);
@@ -46,7 +46,7 @@ export class EmailService {
 
     const result = await this.send({
       tos: [email],
-      subject: '플렘 인증번호',
+      subject: 'PLEM 계정 인증',
       templateName: 'signup.ejs',
       context: {
         verificationCode: verificationCode,
