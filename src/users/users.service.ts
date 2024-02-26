@@ -217,7 +217,7 @@ export class UsersService {
       where: { email },
     });
     if (!user) {
-      throw new NotFoundException('가입되지 않은 이메일입니다.');
+      throw new NotFoundException('가입되지 않은 계정입니다.');
     }
 
     const match = await bcrypt.compare(currentPassword, user.password);
@@ -253,7 +253,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new NotFoundException('가입되지 않은 이메일입니다.');
+      throw new NotFoundException('가입되지 않은 계정입니다.');
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -279,7 +279,7 @@ export class UsersService {
   //     where: { email: originEmail },
   //   });
   //   if (!user) {
-  //     throw new NotFoundException('가입되지 않은 이메일입니다.');
+  //     throw new NotFoundException('가입되지 않은 계정입니다.');
   //   }
 
   //   const result = await this.userRepository.update(user.id, {

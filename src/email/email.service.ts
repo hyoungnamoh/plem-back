@@ -43,7 +43,7 @@ export class EmailService {
         await this.usersService.checkDuplicateEmail({ email });
       } else {
         const user = await this.usersService.getUserFromEmail({ email });
-        if (!user || user.removedAt) throw new NotFoundException('가입되지 않은 이메일입니다.');
+        if (!user || user.removedAt) throw new NotFoundException('가입되지 않은 계정입니다.');
       }
 
       const verificationCode = Math.floor(100000 + Math.random() * 900000);
