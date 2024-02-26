@@ -127,7 +127,11 @@ export class UsersService {
   }
 
   async checkDuplicateEmail({ email }: { email: string }) {
-    const user = await this.userRepository.createQueryBuilder('user').where('user.email = :email', { email }).getOne();
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.email = :email', { email })
+      .withDeleted()
+      .getOne();
 
     if (user && user.removedAt) {
       throw new BadRequestException('탈퇴 처리된 이메일로 사용이 불가능합니다.');
