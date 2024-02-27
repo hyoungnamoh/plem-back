@@ -8,7 +8,6 @@ import { UsersService } from 'src/users/users.service';
 import { JwtStrategy } from './jwt.strategy';
 import { LocalStrategy } from './local.strategy';
 import { PushNotifications } from 'src/entities/PushNotifications';
-import { PushNotificationsService } from 'src/push-notifications/push-notifications.service';
 import { WithdrawalReasonsService } from 'src/withdrawal-reasons/withdrawal-reasons.service';
 import { WithdrwalReasons } from 'src/entities/WithdrwalReasons';
 
@@ -21,14 +20,7 @@ import { WithdrwalReasons } from 'src/entities/WithdrwalReasons';
     }),
     TypeOrmModule.forFeature([Users, PushNotifications, WithdrwalReasons]),
   ],
-  providers: [
-    AuthService,
-    UsersService,
-    JwtStrategy,
-    LocalStrategy,
-    PushNotificationsService,
-    WithdrawalReasonsService,
-  ],
-  exports: [JwtModule, AuthService, PushNotificationsService],
+  providers: [AuthService, UsersService, JwtStrategy, LocalStrategy, WithdrawalReasonsService],
+  exports: [JwtModule, AuthService],
 })
 export class AuthModule {}

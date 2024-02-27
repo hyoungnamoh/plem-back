@@ -2,10 +2,9 @@ import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/co
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from 'src/entities/Users';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import bcrypt from 'bcrypt';
 import { PushNotifications } from 'src/entities/PushNotifications';
-import { PushNotificationsService } from 'src/push-notifications/push-notifications.service';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +12,7 @@ export class AuthService {
     private jwtService: JwtService,
     @InjectRepository(Users)
     private userRepository: Repository<Users>,
-    private pushNotificationService: PushNotificationsService
+    private datasource: DataSource
   ) {}
 
   async validateUser(email: string, password: string) {
@@ -44,17 +43,27 @@ export class AuthService {
   }
 
   async logout({ userId, phoneToken }: { userId: number; phoneToken: PushNotifications['phoneToken'] }) {
-    const result = await this.userRepository.update(userId, {
-      refreshToken: null,
-    });
-    this.pushNotificationService.deletePushNotification({
-      phoneToken,
-      userId,
-    });
-    if (result.affected && result.affected < 1) {
-      throw new NotFoundException('존재하지 않는 유저입니다.');
+    const queryRunner = this.datasource.createQueryRunner();
+    try {
+      queryRunner.connect();
+      queryRunner.startTransaction();
+      await queryRunner.manager.getRepository(Users).update(userId, {
+        refreshToken: null,
+      });
+      await queryRunner.manager
+        .getRepository(PushNotifications)
+        .createQueryBuilder()
+        .delete()
+        .where('user_id=:userId and phone_token=:phoneToken', { userId, phoneToken })
+        .execute();
+      await queryRunner.commitTransaction();
+      return true;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
-    return;
   }
 
   async updateRefreshToken(userId: number, refreshToken: string) {
