@@ -197,55 +197,112 @@ export class SchedulesService {
 
   async getPhoneTokensBySchedule({ date }: { date: string }) {
     const targetDate = dayjs(date).startOf('minute');
-    const targetMonth = targetDate.get('month');
-    const targetHour = targetDate.get('hour');
-    const targetMin = targetDate.get('minute');
-    const targetDay = targetDate.get('day');
-    const targetDayOfMonth = targetDate.get('date');
 
-    const schedulesWithUser = await this.scheduleRepository
+    const everyRepeatSchedules = await this.scheduleRepository
       .createQueryBuilder('schedule')
       .innerJoin('schedule.User', 'user')
       .innerJoin('user.PushNotifications', 'pushNotifications')
       .where('user.plan_notification = 1')
       .andWhere('schedule.notification is not null')
-      .andWhere(':date BETWEEN DATE_SUB(:date, INTERVAL schedule.notification MINUTE) AND schedule.end_date', { date })
-      // .andWhere('schedule.start_date = DATE_ADD(:date, INTERVAL schedule.notification MINUTE)', { date })
+      .andWhere('schedule.repeats = "every"')
+      .andWhere('TIME(:date) = TIME(DATE_SUB(schedule.start_date, INTERVAL schedule.notification MINUTE))', {
+        date,
+      })
       .select(['schedule', 'user', 'pushNotifications'])
       .getMany();
 
-    const filteredSchedules = schedulesWithUser.filter((schedule) => {
-      const scheduleDate = dayjs(schedule.startDate)
-        .startOf('minute')
-        .subtract(Number(schedule.notification), 'minute');
-      const scheduleMonth = scheduleDate.get('month');
-      const scheduleHour = scheduleDate.get('hour');
-      const scheduleMin = scheduleDate.get('minute');
-      const scheduleDay = scheduleDate.get('day');
-      const scheduleDayOfMonth = scheduleDate.get('date');
-      const dateDiff = targetDate.diff(scheduleDate) / 1000 / 24 / 60 / 60;
-      const isSameTime = targetHour === scheduleHour && targetMin === scheduleMin;
-      const isSameDay = targetDay === scheduleDay;
-      const isSameDayOfMonth = targetDayOfMonth === scheduleDayOfMonth;
-      const isSameMonth = targetMonth === scheduleMonth;
+    const weekRepeatSchedules = await this.scheduleRepository
+      .createQueryBuilder('schedule')
+      .innerJoin('schedule.User', 'user')
+      .innerJoin('user.PushNotifications', 'pushNotifications')
+      .where('user.plan_notification = 1')
+      .andWhere('schedule.notification is not null')
+      .andWhere('schedule.repeats = "week"')
+      .andWhere('MOD(DATEDIFF(:date, DATE_SUB(schedule.start_date, INTERVAL schedule.notification MINUTE)), 7) = 0', {
+        date,
+      })
+      .andWhere('TIME(:date) = TIME(DATE_SUB(schedule.start_date, INTERVAL schedule.notification MINUTE))', {
+        date,
+      })
+      .select(['schedule', 'user', 'pushNotifications'])
+      .getMany();
 
-      const everyCondition = schedule.repeats === 'every' && isSameTime;
-      const weekCondition = schedule.repeats === 'week' && isSameDay && isSameTime;
-      const twoWeeksCondition =
-        schedule.repeats === 'twoWeeks' && (dateDiff === 0 || dateDiff % 14 === 0) && isSameTime;
-      const monthCondition = schedule.repeats === 'month' && isSameDayOfMonth && isSameTime;
-      const yearCondition = schedule.repeats === 'year' && isSameMonth && isSameDayOfMonth && isSameTime;
+    const twoWeeksRepeatSchedules = await this.scheduleRepository
+      .createQueryBuilder('schedule')
+      .innerJoin('schedule.User', 'user')
+      .innerJoin('user.PushNotifications', 'pushNotifications')
+      .where('user.plan_notification = 1')
+      .andWhere('schedule.notification is not null')
+      .andWhere('schedule.repeats = "twoWeeks"')
+      .andWhere('MOD(DATEDIFF(:date, DATE_SUB(schedule.start_date, INTERVAL schedule.notification MINUTE)), 14) = 0', {
+        date,
+      })
+      .andWhere('TIME(:date) = TIME(DATE_SUB(schedule.start_date, INTERVAL schedule.notification MINUTE))', {
+        date,
+      })
+      .select(['schedule', 'user', 'pushNotifications'])
+      .getMany();
+    // :date) = TIME(DATE_SUB(`schedule`.`start_date`, INTERVAL `schedule`.`notificatio
+    const monthRepeatSchedules = await this.scheduleRepository
+      .createQueryBuilder('schedule')
+      .innerJoin('schedule.User', 'user')
+      .innerJoin('user.PushNotifications', 'pushNotifications')
+      .where('user.plan_notification = 1')
+      .andWhere('schedule.notification is not null')
+      .andWhere('schedule.repeats = "month"')
+      .andWhere('DAY(:date) = DAY(DATE_SUB(schedule.start_date, INTERVAL schedule.notification MINUTE))', {
+        date,
+      })
+      .andWhere('TIME(:date) = TIME(DATE_SUB(schedule.start_date, INTERVAL schedule.notification MINUTE))', {
+        date,
+      })
+      .select(['schedule', 'user', 'pushNotifications'])
+      .getMany();
 
-      return everyCondition || weekCondition || twoWeeksCondition || monthCondition || yearCondition;
+    const yearRepeatSchedules = await this.scheduleRepository
+      .createQueryBuilder('schedule')
+      .innerJoin('schedule.User', 'user')
+      .innerJoin('user.PushNotifications', 'pushNotifications')
+      .where('user.plan_notification = 1')
+      .andWhere('schedule.notification is not null')
+      .andWhere('schedule.repeats = "year"')
+      .andWhere('MONTH(:date) = MONTH(DATE_SUB(schedule.start_date, INTERVAL schedule.notification MINUTE))', {
+        date,
+      })
+      .andWhere('DAY(:date) = DAY(DATE_SUB(schedule.start_date, INTERVAL schedule.notification MINUTE))', {
+        date,
+      })
+      .andWhere('TIME(:date) = TIME(DATE_SUB(schedule.start_date, INTERVAL schedule.notification MINUTE))', {
+        date,
+      })
+      .select(['schedule', 'user', 'pushNotifications'])
+      .getMany();
+
+    const repeatSchedules = everyRepeatSchedules.concat(
+      weekRepeatSchedules,
+      twoWeeksRepeatSchedules,
+      monthRepeatSchedules,
+      yearRepeatSchedules
+    );
+
+    const endTimeFilteredSchedules = repeatSchedules.filter((schedule) => {
+      if (schedule.repeatEndDate) {
+        const repeatEndDate = dayjs(schedule.repeatEndDate).startOf('minute');
+        const isBeforeOrSame = !targetDate.isAfter(repeatEndDate);
+        return isBeforeOrSame;
+      }
+
+      return true;
     });
 
-    const schedulesWithPhoneTokens = filteredSchedules.map((schedule) => {
+    const schedulesWithPhoneTokens = endTimeFilteredSchedules.map((schedule) => {
       return {
         scheduleName: schedule.name,
         phoneTokens: schedule.User.PushNotifications.map((pushNotification) => pushNotification.phoneToken),
         notification: schedule.notification,
       };
     });
+
     return schedulesWithPhoneTokens;
   }
 
