@@ -21,7 +21,7 @@ const dataSource = new DataSource({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
   entities: [Users, PlanCharts, Plans, SubPlans, Schedules, Notices, PushNotifications, Inquiries, WithdrwalReasons],
-  migrations: [__dirname + '/src/migrations/*.ts'],
+  migrations: [__dirname + '/migrations/*.ts'],
   synchronize: false,
   logging: true,
 });

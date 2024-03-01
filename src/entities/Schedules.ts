@@ -46,6 +46,9 @@ export class Schedules {
   @Column('varchar', { name: 'repeats', length: 100, nullable: true })
   repeats: string | null;
 
+  @Column('varchar', { name: 'repeat_end_date', length: 100, nullable: true })
+  repeatEndDate: string | null;
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
