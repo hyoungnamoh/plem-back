@@ -22,6 +22,7 @@ export class SchedulesService {
     endDate,
     category,
     notification,
+    repeatEndDate,
   }: CreateScheduleDto & { userId: number }) {
     const queryRunner = this.datasource.createQueryRunner();
     queryRunner.connect();
@@ -35,6 +36,7 @@ export class SchedulesService {
       endDate,
       category,
       notification,
+      repeatEndDate,
     });
 
     try {
@@ -148,6 +150,7 @@ export class SchedulesService {
     notification,
     id,
     userId,
+    repeatEndDate,
   }: UpdateScheduleDto & { userId: number }) {
     const queryRunner = this.datasource.createQueryRunner();
     queryRunner.connect();
@@ -165,7 +168,7 @@ export class SchedulesService {
         .getRepository(Schedules)
         .createQueryBuilder()
         .update(Schedules)
-        .set({ name, repeats, startDate, endDate, category, notification })
+        .set({ name, repeats, startDate, endDate, category, notification, repeatEndDate })
         .where('id = :id and removed_at is null and UserId = :userId', { id, userId })
         .execute();
 

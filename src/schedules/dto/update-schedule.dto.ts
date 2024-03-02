@@ -9,4 +9,5 @@ export class UpdateScheduleDto extends PickType(Schedules, [
   'notification',
   'id',
   'repeats',
+  'repeatEndDate',
 ] as const) {}
