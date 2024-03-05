@@ -76,7 +76,7 @@ export class PlanChartsService {
       );
 
       if (!maxRow || maxRow.length < 1) {
-        throw new InternalServerErrorException('문제가 발생하였습니다. 01036423603으로 연락바랍니다.');
+        throw new InternalServerErrorException('서버에 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
       }
 
       const maxOrderNum = maxRow[0].max_order_num === null ? 0 : maxRow[0].max_order_num;
