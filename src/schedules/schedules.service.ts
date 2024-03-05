@@ -201,6 +201,19 @@ export class SchedulesService {
   async getPhoneTokensBySchedule({ date }: { date: string }) {
     const targetDate = dayjs(date).startOf('minute');
 
+    const noRepeatSchedules = await this.scheduleRepository
+      .createQueryBuilder('schedule')
+      .innerJoin('schedule.User', 'user')
+      .innerJoin('user.PushNotifications', 'pushNotifications')
+      .where('user.plan_notification = 1')
+      .andWhere('schedule.notification is not null')
+      .andWhere('schedule.repeats is null')
+      .andWhere('TIME(:date) = TIME(DATE_SUB(schedule.start_date, INTERVAL schedule.notification MINUTE))', {
+        date,
+      })
+      .select(['schedule', 'user', 'pushNotifications'])
+      .getMany();
+
     const everyRepeatSchedules = await this.scheduleRepository
       .createQueryBuilder('schedule')
       .innerJoin('schedule.User', 'user')
@@ -288,7 +301,7 @@ export class SchedulesService {
       yearRepeatSchedules
     );
 
-    const endTimeFilteredSchedules = repeatSchedules.filter((schedule) => {
+    const endTimeFilteredSchedules = noRepeatSchedules.concat(repeatSchedules).filter((schedule) => {
       if (schedule.repeatEndDate) {
         const repeatEndDate = dayjs(schedule.repeatEndDate).startOf('minute');
         const isBeforeOrSame = !targetDate.isAfter(repeatEndDate);
