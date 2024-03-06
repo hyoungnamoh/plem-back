@@ -51,7 +51,7 @@ export class SchedulesService {
   }
 
   async getAllSchedules({ userId }: { userId: number }) {
-    const noRepeatSchedules = this.getSchedules({ userId });
+    const noRepeatSchedules = this.getNoRepeatSchedules({ userId });
     const repeatSchedules = this.getRepeatSchedules({ userId });
     const scheduleResults = await Promise.all([noRepeatSchedules, repeatSchedules]);
 
@@ -61,7 +61,7 @@ export class SchedulesService {
     };
   }
 
-  async getSchedules({ userId }: { userId: number }) {
+  async getNoRepeatSchedules({ userId }: { userId: number }) {
     const schedules = await this.scheduleRepository
       .createQueryBuilder('schedule')
       .where('schedule.UserId = :userId and schedule.removed_at is null and schedule.repeats is null', {
@@ -74,37 +74,7 @@ export class SchedulesService {
       return [];
     }
 
-    const noRepeatSchedules = schedules.filter((schedule) => schedule.repeats === null);
-    const firstScheduleDate = dayjs(schedules[0].startDate);
-    const lastScheduleDate = dayjs(schedules[schedules.length - 1].endDate);
-    const noRepeatScheduleMap = {};
-
-    for (let year = firstScheduleDate.get('year'); year <= lastScheduleDate.get('year'); year++) {
-      noRepeatScheduleMap[year] = {};
-      for (let month = 0; month <= 11; month++) {
-        const yearMonth = dayjs().set('year', year).set('month', month);
-        noRepeatScheduleMap[year][month] = {};
-        for (let date = 1; date <= yearMonth.daysInMonth(); date++) {
-          noRepeatScheduleMap[year][month][date] = [];
-        }
-      }
-    }
-
-    noRepeatSchedules.map((schedule) => {
-      const startDate = dayjs(schedule.startDate);
-      const endDate = dayjs(schedule.endDate);
-      const sameDate = startDate.isSame(endDate, 'day');
-      if (sameDate) {
-        noRepeatScheduleMap[startDate.get('year')][startDate.get('month')][startDate.get('date')].push(schedule);
-        return;
-      } else {
-        for (let date = startDate; date.isBefore(endDate); date = date.add(1, 'day')) {
-          noRepeatScheduleMap[date.get('year')][date.get('month')][date.get('date')].push(schedule);
-        }
-      }
-    });
-
-    return noRepeatScheduleMap;
+    return schedules;
   }
 
   async getRepeatSchedules({ userId }: { userId: number }) {
@@ -115,7 +85,6 @@ export class SchedulesService {
       })
       .orderBy('start_date', 'ASC')
       .getMany();
-
     if (schedules.length === 0) {
       return {
         yearlyRepeatSchedules: [],
