@@ -259,35 +259,53 @@ export class PlanChartsService {
       if (duplicatedRepeatChart) {
         throw new BadRequestException(`"${duplicatedRepeatChart.name}" 일정표와 반복일이 중복됩니다.`);
       }
-      const originPlans = await queryRunner.manager
-        .getRepository(Plans)
-        .createQueryBuilder()
-        .where('plan_chart_id = :chartId and removed_at is null', { chartId: planChart.id })
-        .getMany();
 
-      await Promise.all(originPlans.map((plan) => this.plansService.deletePlan({ id: plan.id })));
+      const originPlans = await queryRunner.manager.getRepository(Plans).find({
+        where: { PlanChartId: id },
+      });
 
-      const newPlans = await Promise.all(
-        plans.map(async (plan) => {
-          plan.PlanChartId = planChart.id;
-          const { id, updatedAt, removedAt, ...planWithoutId } = plan;
+      const addedPlans = plans.filter((plan) => !plan.id);
+      const updatedPlans = plans.filter((plan) => plan.id);
+      const deletedPlanIds = originPlans
+        .map((plan) => plan.id)
+        .filter((id) => !plans.map((plan) => plan.id).includes(id));
 
-          return queryRunner.manager.getRepository(Plans).save(planWithoutId);
-        })
-      );
+      addedPlans.map((plan) => {
+        plan.PlanChartId = id;
+        queryRunner.manager.getRepository(Plans).insert(plan);
+        plan.subPlans.map(async (subPlan) => {
+          subPlan.PlanId = plan.id;
+          queryRunner.manager.getRepository(SubPlans).insert(subPlan);
+        });
+      });
 
-      await Promise.all(
-        newPlans.map(async (plan) => {
-          return await Promise.all(
-            plan.subPlans.map((subPlan) => {
-              subPlan.PlanId = plan.id;
-              const { id, updatedAt, removedAt, ...subPlanWithoutId } = subPlan;
+      updatedPlans.map(async (plan) => {
+        const { id: planId, updatedAt, removedAt, subPlans, ...planWithoutId } = plan;
+        queryRunner.manager.getRepository(Plans).update(planId, planWithoutId);
 
-              return queryRunner.manager.getRepository(SubPlans).save(subPlanWithoutId);
-            })
-          );
-        })
-      );
+        const originSubPlans = await queryRunner.manager.getRepository(SubPlans).find({
+          where: { PlanId: planId },
+        });
+
+        const deletedSubPlanIds = originSubPlans
+          .map((subPlan) => subPlan.id)
+          .filter((id) => !subPlans.map((subPlan) => subPlan.id).includes(id));
+        deletedSubPlanIds.map(async (id) => {
+          queryRunner.manager.getRepository(SubPlans).delete(id);
+        });
+
+        plan.subPlans.map(async (subPlan) => {
+          if (subPlan.id) {
+            queryRunner.manager.getRepository(SubPlans).update(subPlan.id, subPlan);
+          } else {
+            queryRunner.manager.getRepository(SubPlans).insert({ ...subPlan, PlanId: plan.id });
+          }
+        });
+      });
+
+      deletedPlanIds.map(async (planId) => {
+        queryRunner.manager.getRepository(Plans).delete(planId);
+      });
 
       // 선택일 반복일 경우
       if (repeats.includes(7) && repeatDates.length === 0) {
