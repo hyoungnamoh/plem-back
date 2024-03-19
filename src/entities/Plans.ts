@@ -63,7 +63,7 @@ export class Plans {
   @DeleteDateColumn({ name: 'removed_at' })
   removedAt: Date | null;
 
-  @ManyToOne(() => PlanCharts, (planCharts) => planCharts.plans, {
+  @ManyToOne(() => PlanCharts, (planCharts) => planCharts.Plans, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })

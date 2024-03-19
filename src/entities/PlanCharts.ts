@@ -56,12 +56,8 @@ export class PlanCharts {
   @DeleteDateColumn({ name: 'removed_at' })
   removedAt: Date | null;
 
-  @IsArray()
-  @ArrayNotEmpty({ message: '계획이 비어있습니다.' })
   @OneToMany(() => Plans, (plan) => plan.PlanChart)
-  @ValidateNested()
-  @Type(() => OmitType(Plans, ['PlanChartId']))
-  plans: Plans[];
+  Plans: Plans[];
 
   @ManyToOne(() => Users, (users) => users.PlanCharts, {
     onDelete: 'CASCADE',
