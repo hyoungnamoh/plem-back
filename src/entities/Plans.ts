@@ -55,7 +55,7 @@ export class Plans {
   endMin: number;
 
   @Column('varchar', { name: 'temp_id', length: 100, nullable: false })
-  tempId: number;
+  tempId: string;
 
   @CreateDateColumn()
   createdAt: Date;

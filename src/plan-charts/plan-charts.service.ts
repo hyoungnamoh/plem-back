@@ -17,6 +17,7 @@ import { PlansService } from 'src/plans/plans.service';
 import { UpdatePlanChartOrdersDto } from './dto/update-plan-chart-orders.dto';
 import { Users } from 'src/entities/Users';
 import dayjs from 'dayjs';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class PlanChartsService {
@@ -396,27 +397,6 @@ export class PlanChartsService {
         throw new NotFoundException('존재하지 않는 일정표입니다.');
       }
 
-      const copiedPlans = await Promise.all(
-        targetPlanChart.plans.map((plan) => {
-          plan.PlanChartId = targetPlanChart.id;
-          const { id, updatedAt, removedAt, ...planWithoutId } = plan;
-          return queryRunner.manager.getRepository(Plans).save(planWithoutId);
-        })
-      );
-
-      await Promise.all(
-        copiedPlans.map(async (plan) => {
-          return await Promise.all(
-            plan.subPlans.map((subPlan) => {
-              subPlan.PlanId = plan.id;
-              const { id, updatedAt, removedAt, ...subPlanWithoutId } = subPlan;
-
-              return queryRunner.manager.getRepository(SubPlans).save(subPlanWithoutId);
-            })
-          );
-        })
-      );
-
       const clonedPlanCharts = await queryRunner.manager.getRepository(PlanCharts).find({
         where: { name: Like(`복사된 계획표%`), removedAt: IsNull(), UserId: user.id },
       });
@@ -439,16 +419,39 @@ export class PlanChartsService {
         targetPlanChart.name = '복사된 계획표';
       }
 
-      const { id, removedAt, updatedAt, ...copiedPlanChart } = targetPlanChart;
+      const { id, removedAt, updatedAt, plans, ...targetPlanChartWithoutId } = targetPlanChart;
 
-      copiedPlanChart.repeatDates = JSON.stringify([]);
-      copiedPlanChart.repeats = JSON.stringify([null]);
-      const planChartReturned = await queryRunner.manager.getRepository(PlanCharts).save(copiedPlanChart);
-      planChartReturned.repeatDates = JSON.parse(planChartReturned.repeatDates);
-      planChartReturned.repeats = JSON.parse(planChartReturned.repeats);
+      targetPlanChartWithoutId.repeatDates = JSON.stringify([]);
+      targetPlanChartWithoutId.repeats = JSON.stringify([null]);
+      const planChartReturned = await queryRunner.manager.getRepository(PlanCharts).save(targetPlanChartWithoutId);
 
+      const copiedPlans = await Promise.all(
+        targetPlanChart.plans.map(async (plan) => {
+          plan.PlanChartId = planChartReturned.id;
+          plan.tempId = uuidv4();
+          const { id, updatedAt, removedAt, ...planWithoutId } = plan;
+          const savedPlan = await queryRunner.manager.getRepository(Plans).save(planWithoutId);
+          const savedSubPlans = await Promise.all(
+            plan.subPlans.map((subPlan) => {
+              subPlan.PlanId = savedPlan.id;
+              const { id, updatedAt, removedAt, ...subPlanWithoutId } = subPlan;
+
+              return queryRunner.manager.getRepository(SubPlans).save(subPlanWithoutId);
+            })
+          );
+          savedPlan.subPlans = savedSubPlans;
+          return savedPlan;
+        })
+      );
+
+      const copiedPlanChart = {
+        ...planChartReturned,
+        plans: copiedPlans,
+        repeatDates: JSON.parse(planChartReturned.repeatDates),
+        repeats: JSON.parse(planChartReturned.repeats),
+      };
       await queryRunner.commitTransaction();
-      return planChartReturned;
+      return copiedPlanChart;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
