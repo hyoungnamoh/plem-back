@@ -429,7 +429,7 @@ export class PlanChartsService {
         targetPlanChart.plans.map(async (plan) => {
           plan.PlanChartId = planChartReturned.id;
           plan.tempId = uuidv4();
-          const { id, updatedAt, removedAt, ...planWithoutId } = plan;
+          const { id, updatedAt, removedAt, subPlans, ...planWithoutId } = plan;
           const savedPlan = await queryRunner.manager.getRepository(Plans).save(planWithoutId);
           const savedSubPlans = await Promise.all(
             plan.subPlans.map((subPlan) => {
