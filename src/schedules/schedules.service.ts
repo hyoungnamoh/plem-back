@@ -177,6 +177,9 @@ export class SchedulesService {
       .where('user.plan_notification = 1')
       .andWhere('schedule.notification is not null')
       .andWhere('schedule.repeats is null')
+      .andWhere('DATE(:date) = DATE(DATE_SUB(schedule.start_date, INTERVAL schedule.notification MINUTE))', {
+        date,
+      })
       .andWhere('TIME(:date) = TIME(DATE_SUB(schedule.start_date, INTERVAL schedule.notification MINUTE))', {
         date,
       })
@@ -227,7 +230,7 @@ export class SchedulesService {
       })
       .select(['schedule', 'user', 'pushNotifications'])
       .getMany();
-    // :date) = TIME(DATE_SUB(`schedule`.`start_date`, INTERVAL `schedule`.`notificatio
+
     const monthRepeatSchedules = await this.scheduleRepository
       .createQueryBuilder('schedule')
       .innerJoin('schedule.User', 'user')
