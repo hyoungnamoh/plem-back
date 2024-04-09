@@ -130,7 +130,7 @@ export class SchedulesService {
         where: { id },
       });
       if (!schedule) {
-        throw new NotFoundException('존재하지 않는 일정표입니다.');
+        throw new NotFoundException('존재하지 않는 계획표입니다.');
       }
 
       const result = await queryRunner.manager
@@ -161,7 +161,7 @@ export class SchedulesService {
       .getOne();
 
     if (!schedule) {
-      throw new NotFoundException('존재하지 않는 일정표입니다.');
+      throw new NotFoundException('존재하지 않는 계획표입니다.');
     }
 
     await this.scheduleRepository.delete(id);

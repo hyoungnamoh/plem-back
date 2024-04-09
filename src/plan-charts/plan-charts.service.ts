@@ -69,7 +69,7 @@ export class PlanChartsService {
       });
 
       if (duplicatedRepeatChart) {
-        throw new BadRequestException(`"${duplicatedRepeatChart.name}" 일정표와 반복일이 중복됩니다.`);
+        throw new BadRequestException(`"${duplicatedRepeatChart.name}" 계획표와 반복일이 중복됩니다.`);
       }
 
       const maxRow = await this.planChartRepository.manager.query(
@@ -157,7 +157,7 @@ export class PlanChartsService {
       })
       .getOne();
     if (!planChart) {
-      throw new NotFoundException('존재하지 않는 일정표입니다.');
+      throw new NotFoundException('존재하지 않는 계획표입니다.');
     }
 
     planChart.repeatDates = JSON.parse(planChart.repeatDates);
@@ -195,7 +195,7 @@ export class PlanChartsService {
       .getOne();
 
     if (!planChart) {
-      throw new NotFoundException('존재하지 않는 일정표입니다.');
+      throw new NotFoundException('존재하지 않는 계획표입니다.');
     }
 
     await this.planChartRepository.delete(id);
@@ -247,7 +247,7 @@ export class PlanChartsService {
         where: { id },
       });
       if (!planChart) {
-        throw new NotFoundException('존재하지 않는 일정표입니다.');
+        throw new NotFoundException('존재하지 않는 계획표입니다.');
       }
 
       const duplicatedRepeatChart = await this.checkDuplicatedRepeatDay({
@@ -258,7 +258,7 @@ export class PlanChartsService {
       });
 
       if (duplicatedRepeatChart) {
-        throw new BadRequestException(`"${duplicatedRepeatChart.name}" 일정표와 반복일이 중복됩니다.`);
+        throw new BadRequestException(`"${duplicatedRepeatChart.name}" 계획표와 반복일이 중복됩니다.`);
       }
 
       const originPlans = await queryRunner.manager.getRepository(Plans).find({
@@ -394,7 +394,7 @@ export class PlanChartsService {
 
       const targetPlanChart = await this.getPlanChart(body, user);
       if (!targetPlanChart) {
-        throw new NotFoundException('존재하지 않는 일정표입니다.');
+        throw new NotFoundException('존재하지 않는 계획표입니다.');
       }
 
       const clonedPlanCharts = await queryRunner.manager.getRepository(PlanCharts).find({
