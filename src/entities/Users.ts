@@ -33,13 +33,13 @@ export class Users {
   @Column('varchar', { name: 'password', length: 100, select: false })
   @IsNotEmpty({ message: '비밀번호를 입력해주세요.' })
   @Length(8, 20, {
-    message: '비밀번호는 숫자, 문자, 특수문자 조합 8~20자로 입력해주세요',
+    message: '비밀번호는 숫자, 문자, 특수문자(@$!%*#?&) 조합 8~20자로 입력해주세요',
   })
   @IsString({
-    message: '비밀번호는 숫자, 문자, 특수문자 조합 8~20자로 입력해주세요',
+    message: '비밀번호는 숫자, 문자, 특수문자(@$!%*#?&) 조합 8~20자로 입력해주세요',
   })
-  @Matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/, {
-    message: '비밀번호는 숫자, 문자, 특수문자 조합 8~20자로 입력해주세요',
+  @Matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,20}$/, {
+    message: '비밀번호는 숫자, 문자, 특수문자(@$!%*#?&) 조합 8~20자로 입력해주세요',
   })
   password: string;
 
