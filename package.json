@@ -31,7 +31,8 @@
     "db:migrate:revert": "yarn typeorm migration:revert -- -d ./src/dataSource.ts",
     "db:create-migration": "yarn typeorm migration:create -- ./src/migrations/",
     "db:generate-migration": "yarn typeorm migration:generate -- ./src/migrations -d ./src/dataSource.ts",
-    "upload": "yarn build && scp -i ~/Desktop/aws-keys/ec2-plem-staging-instance.pem -r dist/ ubuntu@15.165.81.189:/home/ubuntu/plem-back/"
+    "upload:prod": "yarn build && scp -i ~/Desktop/aws-keys/ec2-plem-staging-instance.pem -r dist/ ubuntu@15.165.81.189:/home/ubuntu/plem-back/",
+    "upload:dev": "yarn build && scp -i ~/Desktop/aws-keys/ec2-plem-staging-instance.pem -r dist/ ubuntu@15.165.81.189:/home/ubuntu/plem-back-dev/"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.8.1",
