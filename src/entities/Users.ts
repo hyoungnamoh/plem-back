@@ -49,6 +49,9 @@ export class Users {
   @Column('tinyint', { name: 'plan_notification', width: 1, default: () => "'0'" })
   planNotification: boolean;
 
+  @Column('tinyint', { name: 'notice_notification', width: 1, default: () => "'0'" })
+  noticeNotification: boolean;
+
   @Column('tinyint', { name: 'enabled', width: 1, default: () => "'1'" })
   enabled: boolean;
 
