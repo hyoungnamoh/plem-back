@@ -113,4 +113,11 @@ export class UsersController {
   async updatePlanNotification(@Body() body: { planNotification: boolean }, @UserDeco() user: Users) {
     return await this.userService.updatePlanNotification({ ...body, userId: user.id });
   }
+
+  // 공지사항 알림 설정 on/off
+  @Put('/notification/notice')
+  @UseGuards(JwtAuthGuard)
+  async updateNoticeNotification(@Body() body: { noticeNotification: boolean }, @UserDeco() user: Users) {
+    return await this.userService.updateNoticeNotification({ ...body, userId: user.id });
+  }
 }

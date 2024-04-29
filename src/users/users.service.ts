@@ -374,4 +374,39 @@ export class UsersService {
       await queryRunner.release();
     }
   }
+
+  async updateNoticeNotification({ userId, noticeNotification }: { userId: number; noticeNotification: boolean }) {
+    const queryRunner = this.datasource.createQueryRunner();
+    try {
+      queryRunner.connect();
+      queryRunner.startTransaction();
+      const user = await this.userRepository
+        .createQueryBuilder('user')
+        .where('id = :userId and removed_at is null', { userId })
+        .getOne();
+
+      if (!user) {
+        throw new BadRequestException('잘못된 요청입니다.');
+      }
+
+      await queryRunner.manager
+        .getRepository(Users)
+        .createQueryBuilder('user')
+        .update(Users)
+        .set({ noticeNotification })
+        .where('id = :userId', { userId })
+        .execute();
+
+      await queryRunner.commitTransaction();
+
+      return {
+        id: userId,
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
 }
