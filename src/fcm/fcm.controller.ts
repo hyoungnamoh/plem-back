@@ -12,7 +12,7 @@ export class FcmController {
 
   @Post('topic')
   @UseGuards(JwtAuthGuard)
-  // FIXME 관리자만 사용 가능하도록 수정
+  // FIXME: 관리자만 사용 가능하도록 수정
   async postFcmTopic(
     @Body()
     body: {

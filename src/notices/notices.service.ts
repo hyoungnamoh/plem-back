@@ -1,6 +1,8 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Notices } from 'src/entities/Notices';
+import { Users } from 'src/entities/Users';
+import { FcmService } from 'src/fcm/fcm.service';
 import { DataSource, Repository } from 'typeorm';
 import { CreateNoticeDto } from './create-notices.dto';
 import { UpdateNoticeDto } from './update-notices.dto';
@@ -11,6 +13,9 @@ export class NoticeService {
   constructor(
     @InjectRepository(Notices)
     private noticeRepository: Repository<Notices>,
+    @InjectRepository(Users)
+    private userRepository: Repository<Users>,
+    private fcmService: FcmService,
     private datasource: DataSource
   ) {}
 
@@ -22,6 +27,18 @@ export class NoticeService {
     try {
       const contentPaths = contents.map((content) => content.path);
       await queryRunner.manager.getRepository(Notices).save({ title, contents: JSON.stringify(contentPaths) });
+      const targetUsers = await this.userRepository
+        .createQueryBuilder('user')
+        .innerJoin('user.PushNotifications', 'pushNotifications')
+        .where('user.notice_notification = 1')
+        .select(['user', 'pushNotifications'])
+        .getMany();
+      targetUsers.map((targetUser) => {
+        targetUser.PushNotifications.map((pushNotification) => {
+          this.fcmService.fcm(pushNotification.phoneToken, '플렘', title, 'notice', 'noticeListPage');
+        });
+      });
+
       await queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -35,6 +52,7 @@ export class NoticeService {
     const notices = await this.noticeRepository
       .createQueryBuilder('notices')
       .where('notices.removed_at is null')
+      .orderBy('notices.createdAt', 'DESC')
       .getMany();
 
     const parsedNotices = notices.map((notice) => {

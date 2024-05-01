@@ -3,11 +3,12 @@ import * as admin from 'firebase-admin';
 
 @Injectable()
 export class FcmService {
-  async fcm(token: string, title: string, message: string, channel: string) {
+  async fcm(token: string, title: string, message: string, channel: string, navigationId = '') {
     const result = await admin
       .messaging()
       .send({
         token: token,
+        data: { navigationId: navigationId },
         notification: {
           title: title,
           body: message,

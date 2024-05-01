@@ -98,6 +98,7 @@ import { WithdrawalReasonsService } from './withdrawal-reasons/withdrawal-reason
     FcmModule,
     InquiriesModule,
     WithdrawalReasonsModule,
+    NoticeModule,
   ],
   controllers: [
     AppController,
