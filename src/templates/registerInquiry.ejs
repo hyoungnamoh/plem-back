@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light only"/>
+    <meta name="supported-color-schemes" content="light"/>
+    <style>
+      body {  
+        color-scheme: light only;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="content" style="width: 100%; background-color: #F4F1E8; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 32px 0px; color:#1C1C1C;">
+      <div style="padding: 0 12px;">
+        <img src="https://plem-s3.s3.ap-northeast-2.amazonaws.com/logo.png" width="108px" height="32px" alt="logo" style="margin-top: 20px;">
+        <div style="padding: 40px 32px; max-width: 600px; display: flex; flex-direction: column; background-color: #fff; border-radius: 12px; margin-top: 20px;">
+          <div style="font-size: 24px; font-weight: 700;">🍋 PLEM 인증 번호 안내</div>
+            <div style="font-size: 14px; line-height: 1.42; margin-top: 16px;">
+              문의가 등록됐습니다.
+              <br />
+              <%= locals.type %> / <%= locals.email %> / <%= locals.title %> / <%= locals.content %> / <%= locals.userId %>
+            </div>
+        </div>
+        <div style="margin-left: 32px; color: #252E40; opacity: 0.3; font-size: 12px; margin-top: 20px;">@ <%= locals.year %> PLEM, All rights reserved.</div>
+      </div>
+    </div>
+  </body>
+</html>
