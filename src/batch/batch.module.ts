@@ -13,11 +13,12 @@ import { Users } from 'src/entities/Users';
 import { PushNotifications } from 'src/entities/PushNotifications';
 import { SchedulesService } from 'src/schedules/schedules.service';
 import { Schedules } from 'src/entities/Schedules';
+import { Holidays } from 'src/entities/Holidays';
 
 @Module({
   imports: [
     NestScheduleModule.forRoot(),
-    TypeOrmModule.forFeature([PlanCharts, Plans, SubPlans, Users, PushNotifications, Schedules]),
+    TypeOrmModule.forFeature([PlanCharts, Plans, SubPlans, Users, PushNotifications, Schedules, Holidays]),
   ],
   providers: [BatchService, FcmService, PlansService, PlanChartsService, SchedulesService],
   controllers: [BatchController],

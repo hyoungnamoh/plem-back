@@ -144,8 +144,14 @@ export class UsersService {
     return true;
   }
 
-  async getUserFromEmail({ email }: { email: string }) {
+  async getUserByEmail({ email }: { email: string }) {
     const user = await this.userRepository.createQueryBuilder('user').where('user.email = :email', { email }).getOne();
+
+    return user;
+  }
+
+  async getUserById({ userId }: { userId: number }) {
+    const user = await this.userRepository.createQueryBuilder('user').where('user.id = :userId', { userId }).getOne();
 
     return user;
   }

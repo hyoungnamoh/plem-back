@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import dayjs from 'dayjs';
+import { Holidays } from 'src/entities/Holidays';
 import { Schedules } from 'src/entities/Schedules';
 import { DataSource, Repository } from 'typeorm';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
@@ -11,6 +12,8 @@ export class SchedulesService {
   constructor(
     @InjectRepository(Schedules)
     private scheduleRepository: Repository<Schedules>,
+    @InjectRepository(Holidays)
+    private holidayRepository: Repository<Holidays>,
     private datasource: DataSource
   ) {}
 
@@ -51,14 +54,26 @@ export class SchedulesService {
   }
 
   async getAllSchedules({ userId }: { userId: number }) {
-    const noRepeatSchedules = this.getNoRepeatSchedules({ userId });
-    const repeatSchedules = this.getRepeatSchedules({ userId });
-    const scheduleResults = await Promise.all([noRepeatSchedules, repeatSchedules]);
+    const holidaysResponse = this.holidayRepository.createQueryBuilder('holidays').getMany();
+    const noRepeatSchedulesResponse = this.getNoRepeatSchedules({ userId });
+    const repeatSchedulesResponse = this.getRepeatSchedules({ userId });
+    const [noRepeatSchedules, repeatSchedules, holidays] = await Promise.all([
+      noRepeatSchedulesResponse,
+      repeatSchedulesResponse,
+      holidaysResponse,
+    ]);
 
     return {
-      noRepeatSchedules: scheduleResults[0],
-      repeatSchedules: scheduleResults[1],
+      noRepeatSchedules,
+      repeatSchedules,
+      holidays: this.injectScheduleType(holidays, 'holiday'),
     };
+  }
+
+  injectScheduleType(schedules: (Schedules | Holidays)[], type: 'schedule' | 'holiday') {
+    return schedules.map((schedule) => {
+      return { ...schedule, type };
+    });
   }
 
   async getNoRepeatSchedules({ userId }: { userId: number }) {
@@ -74,7 +89,7 @@ export class SchedulesService {
       return [];
     }
 
-    return schedules;
+    return this.injectScheduleType(schedules, 'schedule');
   }
 
   async getRepeatSchedules({ userId }: { userId: number }) {
@@ -95,11 +110,26 @@ export class SchedulesService {
       };
     }
 
-    const yearlyRepeatSchedules = schedules.filter((schedule) => schedule.repeats === 'year');
-    const monthlyRepeatSchedules = schedules.filter((schedule) => schedule.repeats === 'month');
-    const twoWeeklyRepeatSchedules = schedules.filter((schedule) => schedule.repeats === 'twoWeeks');
-    const weeklyRepeatSchedules = schedules.filter((schedule) => schedule.repeats === 'week');
-    const dailyRepeatSchedules = schedules.filter((schedule) => schedule.repeats === 'every');
+    const yearlyRepeatSchedules = this.injectScheduleType(
+      schedules.filter((schedule) => schedule.repeats === 'year'),
+      'schedule'
+    );
+    const monthlyRepeatSchedules = this.injectScheduleType(
+      schedules.filter((schedule) => schedule.repeats === 'month'),
+      'schedule'
+    );
+    const twoWeeklyRepeatSchedules = this.injectScheduleType(
+      schedules.filter((schedule) => schedule.repeats === 'twoWeeks'),
+      'schedule'
+    );
+    const weeklyRepeatSchedules = this.injectScheduleType(
+      schedules.filter((schedule) => schedule.repeats === 'week'),
+      'schedule'
+    );
+    const dailyRepeatSchedules = this.injectScheduleType(
+      schedules.filter((schedule) => schedule.repeats === 'every'),
+      'schedule'
+    );
 
     return {
       yearlyRepeatSchedules,

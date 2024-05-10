@@ -51,6 +51,8 @@ import { WithdrwalReasons } from './entities/WithdrwalReasons';
 import { WithdrawalReasonsModule } from './withdrawal-reasons/withdrawal-reasons.module';
 import { WithdrawalReasonsController } from './withdrawal-reasons/withdrawal-reasons.controller';
 import { WithdrawalReasonsService } from './withdrawal-reasons/withdrawal-reasons.service';
+import { CalendarModule } from './calendar/calendar.module';
+import { Holidays } from './entities/Holidays';
 
 @Module({
   imports: [
@@ -71,6 +73,7 @@ import { WithdrawalReasonsService } from './withdrawal-reasons/withdrawal-reason
       PushNotifications,
       Inquiries,
       WithdrwalReasons,
+      Holidays,
     ]),
     AuthModule,
     PlanChartsModule,
@@ -98,6 +101,7 @@ import { WithdrawalReasonsService } from './withdrawal-reasons/withdrawal-reason
     FcmModule,
     InquiriesModule,
     WithdrawalReasonsModule,
+    CalendarModule,
   ],
   controllers: [
     AppController,

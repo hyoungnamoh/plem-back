@@ -42,7 +42,7 @@ export class EmailService {
       if (!isReset) {
         await this.usersService.checkDuplicateEmail({ email });
       } else {
-        const user = await this.usersService.getUserFromEmail({ email });
+        const user = await this.usersService.getUserByEmail({ email });
         if (!user || user.removedAt) throw new NotFoundException('가입되지 않은 계정입니다.');
       }
 
