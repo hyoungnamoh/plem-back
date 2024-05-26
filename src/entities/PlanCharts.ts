@@ -1,4 +1,4 @@
-import { ArrayNotEmpty, IsArray, IsNotEmpty, IsNumber, IsString, Length, ValidateNested } from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsNotEmpty, IsNumber, IsString, Length } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
@@ -13,8 +13,6 @@ import {
 } from 'typeorm';
 import { Users } from './Users';
 import { Plans } from './Plans';
-import { Type } from 'class-transformer';
-import { OmitType } from '@nestjs/swagger';
 
 @Index('user_id', ['UserId'], {})
 @Entity('plan_charts', { schema: 'plem' })
