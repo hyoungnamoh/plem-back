@@ -19,10 +19,17 @@ export class BatchService {
     const current = dayjs();
     const startHour = current.get('hour');
     const startMin = current.get('minute');
-    const targetTokensWithPlanName = await this.plansService.getPhoneTokensByPlan({ startHour, startMin });
+    const targetPlans = await this.plansService.getNotificationTargetPlans({ startHour, startMin });
 
-    targetTokensWithPlanName.forEach((target) => {
-      this.fcmService.fcm(target.phoneToken, '플렘', `${target.planName} 시간이에요!`, 'plan');
+    targetPlans.forEach((targetPlan) => {
+      targetPlan.phoneTokens.forEach((phoneToken) => {
+        this.fcmService.fcm(
+          phoneToken.phoneToken,
+          '플렘',
+          this.getFcmContent({ name: targetPlan.planName, notification: targetPlan.notification, type: 'plan' }),
+          'plan'
+        );
+      });
     });
   }
 
@@ -34,24 +41,25 @@ export class BatchService {
       // date: '2024-03-16 23:55:00',
     });
 
-    const getScheduleFcmContent = (target: {
-      scheduleName: string;
-      phoneTokens: string[];
-      notification: string | null;
-    }) => {
-      if (target.notification === '0') {
-        return `${target.scheduleName} 일정 시간이에요!`;
-      }
-      if (target.notification === '60') {
-        return `${target.scheduleName} 일정이 1시간 뒤 예정되어 있어요!`;
-      }
-      return `${target.scheduleName} 일정이 ${target.notification}분 뒤 예정되어 있어요!`;
-    };
-
     schedulesWithPhoneTokens.forEach((target) => {
       target.phoneTokens.forEach((phoneToken) => {
-        this.fcmService.fcm(phoneToken, '플렘', getScheduleFcmContent(target), 'schedule');
+        this.fcmService.fcm(
+          phoneToken,
+          '플렘',
+          this.getFcmContent({ name: target.scheduleName, notification: target.notification, type: 'schedule' }),
+          'schedule'
+        );
       });
     });
+  }
+
+  getFcmContent(fcmData: { name: string; notification: string | null; type: 'plan' | 'schedule' }) {
+    if (fcmData.notification === '0') {
+      return `${fcmData.name} 계획 시간이에요!`;
+    }
+    if (fcmData.notification === '60') {
+      return `${fcmData.name} 계획이 1시간 뒤 예정되어 있어요!`;
+    }
+    return `${fcmData.name} 계획이 ${fcmData.notification}분 뒤 예정되어 있어요!`;
   }
 }
