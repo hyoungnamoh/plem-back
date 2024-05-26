@@ -38,10 +38,6 @@ export class PlansService {
   }
 
   async deletePlan({ id }: { id: number }) {
-    if (id === 9999) {
-      await this.planRepository.createQueryBuilder().delete().from(Plans).execute();
-      return;
-    }
     const deletedResult = await this.planRepository
       .createQueryBuilder()
       .delete()
