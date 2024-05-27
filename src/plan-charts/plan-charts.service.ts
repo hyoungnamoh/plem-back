@@ -271,14 +271,16 @@ export class PlanChartsService {
         .map((plan) => plan.id)
         .filter((id) => !plans.map((plan) => plan.id).includes(id));
 
-      addedPlans.map((plan) => {
-        plan.PlanChartId = id;
-        queryRunner.manager.getRepository(Plans).insert(plan);
-        plan.subPlans.map(async (subPlan) => {
-          subPlan.PlanId = plan.id;
-          queryRunner.manager.getRepository(SubPlans).insert(subPlan);
-        });
-      });
+      await Promise.all(
+        addedPlans.map(async (plan) => {
+          plan.PlanChartId = id;
+          const savedPlan = await queryRunner.manager.getRepository(Plans).save(plan);
+          plan.subPlans.map(async (subPlan) => {
+            subPlan.PlanId = savedPlan.id;
+            queryRunner.manager.getRepository(SubPlans).insert(subPlan);
+          });
+        })
+      );
 
       updatedPlans.map(async (plan) => {
         const { id: planId, updatedAt, removedAt, subPlans, ...planWithoutId } = plan;
