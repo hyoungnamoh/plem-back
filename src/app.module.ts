@@ -53,6 +53,10 @@ import { WithdrawalReasonsController } from './withdrawal-reasons/withdrawal-rea
 import { WithdrawalReasonsService } from './withdrawal-reasons/withdrawal-reasons.service';
 import { CalendarModule } from './calendar/calendar.module';
 import { Holidays } from './entities/Holidays';
+import { SubPlanHistoriesModule } from './sub-plan-histories/sub-plan-histories.module';
+import { SubPlanHistories } from './entities/SubPlanHistories';
+import { SubPlanHistoriesController } from './sub-plan-histories/sub-plan-histories.controller';
+import { SubPlanHistoriesService } from './sub-plan-histories/sub-plan-histories.service';
 
 @Module({
   imports: [
@@ -74,6 +78,7 @@ import { Holidays } from './entities/Holidays';
       Inquiries,
       WithdrwalReasons,
       Holidays,
+      SubPlanHistories,
     ]),
     AuthModule,
     PlanChartsModule,
@@ -102,6 +107,7 @@ import { Holidays } from './entities/Holidays';
     InquiriesModule,
     WithdrawalReasonsModule,
     CalendarModule,
+    SubPlanHistoriesModule,
   ],
   controllers: [
     AppController,
@@ -115,6 +121,7 @@ import { Holidays } from './entities/Holidays';
     FcmController,
     InquiriesController,
     WithdrawalReasonsController,
+    SubPlanHistoriesController,
   ],
   providers: [
     AppService,
@@ -129,6 +136,7 @@ import { Holidays } from './entities/Holidays';
     FcmService,
     InquiriesService,
     WithdrawalReasonsService,
+    SubPlanHistoriesService,
   ],
 })
 export class AppModule implements NestModule {
