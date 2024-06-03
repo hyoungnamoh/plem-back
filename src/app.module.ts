@@ -57,6 +57,10 @@ import { SubPlanHistoriesModule } from './sub-plan-histories/sub-plan-histories.
 import { SubPlanHistories } from './entities/SubPlanHistories';
 import { SubPlanHistoriesController } from './sub-plan-histories/sub-plan-histories.controller';
 import { SubPlanHistoriesService } from './sub-plan-histories/sub-plan-histories.service';
+import { GoalsModule } from './goals/goals.module';
+import { GoalsController } from './goals/goals.controller';
+import { GoalsService } from './goals/goals.service';
+import { Goals } from './entities/Goals';
 
 @Module({
   imports: [
@@ -79,6 +83,7 @@ import { SubPlanHistoriesService } from './sub-plan-histories/sub-plan-histories
       WithdrwalReasons,
       Holidays,
       SubPlanHistories,
+      Goals,
     ]),
     AuthModule,
     PlanChartsModule,
@@ -108,6 +113,7 @@ import { SubPlanHistoriesService } from './sub-plan-histories/sub-plan-histories
     WithdrawalReasonsModule,
     CalendarModule,
     SubPlanHistoriesModule,
+    GoalsModule,
   ],
   controllers: [
     AppController,
@@ -122,6 +128,7 @@ import { SubPlanHistoriesService } from './sub-plan-histories/sub-plan-histories
     InquiriesController,
     WithdrawalReasonsController,
     SubPlanHistoriesController,
+    GoalsController,
   ],
   providers: [
     AppService,
@@ -137,6 +144,7 @@ import { SubPlanHistoriesService } from './sub-plan-histories/sub-plan-histories
     InquiriesService,
     WithdrawalReasonsService,
     SubPlanHistoriesService,
+    GoalsService,
   ],
 })
 export class AppModule implements NestModule {

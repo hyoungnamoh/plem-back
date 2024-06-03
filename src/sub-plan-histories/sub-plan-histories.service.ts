@@ -59,15 +59,18 @@ export class SubPlanHistoriesService {
   }
 
   async getSubPlanRankingTop({ userId }: { userId: number }) {
-    const subPlanRankingTop = await this.subPlanHistoryRepository
+    const subPlanRankingTop = (await this.subPlanHistoryRepository
       .createQueryBuilder('subPlanHistories')
       .select('subPlanHistories.subPlanName', 'subPlanName')
       .addSelect('COUNT(*)', 'count')
       .where('subPlanHistories.UserId = :userId', { userId })
       .groupBy('subPlanHistories.subPlanName')
       .orderBy('count', 'DESC')
-      .getRawOne();
+      .getRawOne()) as { subPlanName: string; count: string };
 
-    return subPlanRankingTop;
+    return {
+      ...subPlanRankingTop,
+      count: Number(subPlanRankingTop.count),
+    };
   }
 }
