@@ -150,6 +150,7 @@ export class SchedulesService {
     id,
     userId,
     repeatEndDate,
+    memo,
   }: UpdateScheduleDto & { userId: number }) {
     const queryRunner = this.datasource.createQueryRunner();
     queryRunner.connect();
@@ -167,12 +168,12 @@ export class SchedulesService {
         .getRepository(Schedules)
         .createQueryBuilder()
         .update(Schedules)
-        .set({ name, repeats, startDate, endDate, category, notification, repeatEndDate })
+        .set({ name, repeats, startDate, endDate, category, notification, repeatEndDate, memo })
         .where('id = :id and removed_at is null and UserId = :userId', { id, userId })
         .execute();
 
       if (result.affected === 0) {
-        throw new NotFoundException('순서 변경에 실패했습니다. 다시 시도해주세요.');
+        throw new NotFoundException('일정 수정 중 오류가 발생했습니다.');
       }
 
       await queryRunner.commitTransaction();
