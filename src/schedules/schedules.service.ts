@@ -26,6 +26,7 @@ export class SchedulesService {
     category,
     notification,
     repeatEndDate,
+    memo,
   }: CreateScheduleDto & { userId: number }) {
     const queryRunner = this.datasource.createQueryRunner();
     queryRunner.connect();
@@ -40,6 +41,7 @@ export class SchedulesService {
       category,
       notification,
       repeatEndDate,
+      memo,
     });
 
     try {

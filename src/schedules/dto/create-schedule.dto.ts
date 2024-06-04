@@ -9,4 +9,5 @@ export class CreateScheduleDto extends PickType(Schedules, [
   'notification',
   'repeats',
   'repeatEndDate',
+  'memo',
 ] as const) {}
