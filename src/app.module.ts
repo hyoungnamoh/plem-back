@@ -61,6 +61,10 @@ import { GoalsModule } from './goals/goals.module';
 import { GoalsController } from './goals/goals.controller';
 import { GoalsService } from './goals/goals.service';
 import { Goals } from './entities/Goals';
+import { AllPlansAchievedHistoriesModule } from './all-plans-achieved-histories/all-plans-achieved-histories.module';
+import { AllPlansAchievedHistories } from './entities/AllPlansAchievedHistories';
+import { AllPlansAchievedHistoriesController } from './all-plans-achieved-histories/all-plans-achieved-histories.controller';
+import { AllPlansAchievedHistoriesService } from './all-plans-achieved-histories/all-plans-achieved-histories.service';
 
 @Module({
   imports: [
@@ -84,6 +88,7 @@ import { Goals } from './entities/Goals';
       Holidays,
       SubPlanHistories,
       Goals,
+      AllPlansAchievedHistories,
     ]),
     AuthModule,
     PlanChartsModule,
@@ -114,6 +119,7 @@ import { Goals } from './entities/Goals';
     CalendarModule,
     SubPlanHistoriesModule,
     GoalsModule,
+    AllPlansAchievedHistoriesModule,
   ],
   controllers: [
     AppController,
@@ -129,6 +135,7 @@ import { Goals } from './entities/Goals';
     WithdrawalReasonsController,
     SubPlanHistoriesController,
     GoalsController,
+    AllPlansAchievedHistoriesController,
   ],
   providers: [
     AppService,
@@ -145,6 +152,7 @@ import { Goals } from './entities/Goals';
     WithdrawalReasonsService,
     SubPlanHistoriesService,
     GoalsService,
+    AllPlansAchievedHistoriesService,
   ],
 })
 export class AppModule implements NestModule {

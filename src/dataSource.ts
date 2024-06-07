@@ -12,6 +12,7 @@ import { WithdrwalReasons } from './entities/WithdrwalReasons';
 import { Holidays } from './entities/Holidays';
 import { SubPlanHistories } from './entities/SubPlanHistories';
 import { Goals } from './entities/Goals';
+import { AllPlansAchievedHistories } from './entities/AllPlansAchievedHistories';
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ const dataSource = new DataSource({
     Holidays,
     SubPlanHistories,
     Goals,
+    AllPlansAchievedHistories,
   ],
   migrations: [__dirname + '/migrations/*.ts'],
   synchronize: false,

@@ -12,7 +12,7 @@ export class GoalsService {
     private subPlanHistoriesService: SubPlanHistoriesService
   ) {}
 
-  async addGoal(body: CreateGoalsDto) {
+  async createGoal(body: CreateGoalsDto) {
     const goal = new Goals();
     goal.title = body.title;
     goal.id = body.id;

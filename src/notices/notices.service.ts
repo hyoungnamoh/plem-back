@@ -145,7 +145,7 @@ export class NoticeService {
       .where('notice.id = :id and removed_at is null', { id })
       .getOne();
     if (!notice) {
-      throw new NotFoundException('존재하지 않는 계획표입니다.');
+      throw new NotFoundException('존재하지 않는 공지입니다.');
     }
     await this.noticeRepository.softDelete(id);
   }
