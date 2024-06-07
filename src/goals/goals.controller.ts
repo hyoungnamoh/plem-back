@@ -16,7 +16,7 @@ export class GoalsController {
   }
 
   // 달성 현황 조회
-  @Get('/goalStatusList')
+  @Get('/statusList')
   @UseGuards(JwtAuthGuard)
   async getGoalStatusList(@UserDeco() user: Users) {
     return await this.goalsService.getGoalStatusList({ userId: user.id });

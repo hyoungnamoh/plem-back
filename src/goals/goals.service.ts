@@ -16,25 +16,36 @@ export class GoalsService {
     const goal = new Goals();
     goal.title = body.title;
     goal.id = body.id;
+    goal.goalCount = body.goalCount;
     return await this.goalsRepository.save(goal);
   }
 
   async getGoalStatusList({ userId }: { userId: number }) {
     const goals = await this.getGoals();
-    const achievementData = await Promise.all([this.subPlanHistoriesService.getSubPlanRankingTop({ userId })]);
+    const achievementData = await Promise.all([
+      this.subPlanHistoriesService.getSubPlanRankingTop({ userId }),
+      this.subPlanHistoriesService.getAchievedList({ userId }),
+    ]);
     const topSubPlan = achievementData[0];
+    const achievedList = achievementData[1];
 
     // 각 목표별 달성횟수 조회
     const getAchievementInfo = (goalId: number) => {
       switch (goalId) {
-        case 1: // 동일 할일을 7번 체크
-        case 2: // 동일 할일을 30번 체크
-        case 3: // 동일 할일을 100번 체크
-        case 4: // 동일 할일을 200번 체크
-        case 5: // 동일 할일을 300번 체크
-        case 6: // 동일 할일을 365번 체크
-        case 7: // 동일 할일을 1000번 체크
+        case 1: // 동일 할일을 7번 달성
+        case 2: // 동일 할일을 30번 달성
+        case 3: // 동일 할일을 100번 달성
+        case 4: // 동일 할일을 200번 달성
+        case 5: // 동일 할일을 300번 달성
+        case 6: // 동일 할일을 365번 달성
+        case 7: // 동일 할일을 1000번 달성
           return topSubPlan;
+        case 8: // 20개의 할 일을 한 번씩 달성
+        case 9: // 50개의 할 일을 한 번씩 달성
+          return { count: achievedList.length };
+        case 10: // 20개의 할 일을 한 번씩 달성
+        case 11: // 50개의 할 일을 한 번씩 달성
+          return { count: achievedList.length };
         default:
           throw new InternalServerErrorException('존재하지 않는 목표입니다.');
       }
@@ -45,7 +56,6 @@ export class GoalsService {
       return {
         id: goal.id,
         title: goal.title,
-        subPlanName: achivementInfo.subPlanName,
         achievementCount: achivementInfo.count,
         goalCount: goal.goalCount,
       };

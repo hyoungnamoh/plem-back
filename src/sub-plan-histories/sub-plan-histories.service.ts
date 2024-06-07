@@ -73,4 +73,13 @@ export class SubPlanHistoriesService {
       count: Number(subPlanRankingTop.count),
     };
   }
+
+  async getAchievedList({ userId }: { userId: number }) {
+    const achievedList = await this.subPlanHistoryRepository
+      .createQueryBuilder('subPlanHistories')
+      .select('DISTINCT subPlanHistories.subPlanName', 'subPlanName')
+      .where('subPlanHistories.UserId = :userId', { userId })
+      .getRawMany();
+    return achievedList;
+  }
 }
