@@ -12,7 +12,7 @@ export class Goals {
   @Column('varchar', { name: 'title', length: 200, nullable: false })
   title: string;
 
-  @Column('int', { name: 'goalCount', nullable: false })
+  @Column('int', { name: 'goal_count', nullable: false })
   goalCount: number;
 
   @CreateDateColumn()
