@@ -1,5 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AllPlansAchievedHistoriesService } from 'src/all-plans-achieved-histories/all-plans-achieved-histories.service';
 import { Goals } from 'src/entities/Goals';
 import { SubPlanHistoriesService } from 'src/sub-plan-histories/sub-plan-histories.service';
 import { Repository } from 'typeorm';
@@ -9,7 +10,8 @@ import { CreateGoalsDto } from './dto/create-goals.dto';
 export class GoalsService {
   constructor(
     @InjectRepository(Goals) private goalsRepository: Repository<Goals>,
-    private subPlanHistoriesService: SubPlanHistoriesService
+    private subPlanHistoriesService: SubPlanHistoriesService,
+    private allPlansAchievedHistoriesService: AllPlansAchievedHistoriesService
   ) {}
 
   async createGoal(body: CreateGoalsDto) {
@@ -25,9 +27,11 @@ export class GoalsService {
     const achievementData = await Promise.all([
       this.subPlanHistoriesService.getSubPlanRankingTop({ userId }),
       this.subPlanHistoriesService.getAchievedList({ userId }),
+      this.allPlansAchievedHistoriesService.getAllPlansAchievedHistory({ userId }),
     ]);
     const topSubPlan = achievementData[0];
     const achievedList = achievementData[1];
+    const allPlansAchievedHistory = achievementData[2];
 
     // 각 목표별 달성횟수 조회
     const getAchievementInfo = (goalId: number) => {
@@ -43,9 +47,9 @@ export class GoalsService {
         case 8: // 20개의 할 일을 한 번씩 달성
         case 9: // 50개의 할 일을 한 번씩 달성
           return { count: achievedList.length };
-        case 10: // 20개의 할 일을 한 번씩 달성
-        case 11: // 50개의 할 일을 한 번씩 달성
-          return { count: achievedList.length };
+        case 10: // 하루에 할 일을 전부 3일간 달성
+        case 11: // 하루에 할 일을 전부 14일간 달성
+          return { count: allPlansAchievedHistory.length };
         default:
           throw new InternalServerErrorException('존재하지 않는 목표입니다.');
       }
