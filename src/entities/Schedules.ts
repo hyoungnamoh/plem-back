@@ -49,8 +49,8 @@ export class Schedules {
   @Column('varchar', { name: 'repeat_end_date', length: 100, nullable: true })
   repeatEndDate: string | null;
 
-  @MaxLength(200, { message: '메모는 최대 200자까지 입력 가능합니다.' })
-  @Column('varchar', { name: 'memo', length: 400, nullable: false, default: '' })
+  // @Length(0, 200, { message: '메모는 최대 200자까지 입력 가능합니다.' })
+  @Column('varchar', { name: 'memo', length: 400, default: '' })
   memo: string;
 
   @CreateDateColumn({ type: 'timestamp' })
