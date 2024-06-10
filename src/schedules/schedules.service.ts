@@ -306,7 +306,10 @@ export class SchedulesService {
       yearRepeatSchedules
     );
 
-    const endTimeFilteredSchedules = noRepeatSchedules.concat(repeatSchedules).filter((schedule) => {
+    const periodFilteredSchedules = noRepeatSchedules.concat(repeatSchedules).filter((schedule) => {
+      if (targetDate.startOf('minute').isBefore(dayjs(schedule.startDate))) {
+        return false;
+      }
       if (schedule.repeatEndDate) {
         const repeatEndDate = dayjs(schedule.repeatEndDate).startOf('minute');
         const isBeforeOrSame = !targetDate.isAfter(repeatEndDate);
@@ -316,7 +319,7 @@ export class SchedulesService {
       return true;
     });
 
-    const schedulesWithPhoneTokens = endTimeFilteredSchedules.map((schedule) => {
+    const schedulesWithPhoneTokens = periodFilteredSchedules.map((schedule) => {
       return {
         scheduleName: schedule.name,
         phoneTokens: schedule.User.PushNotifications.map((pushNotification) => pushNotification.phoneToken),
