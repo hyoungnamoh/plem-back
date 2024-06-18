@@ -54,12 +54,15 @@ export class BatchService {
   }
 
   getFcmContent(fcmData: { name: string; notification: string | null; type: 'plan' | 'schedule' }) {
+    const isPlan = fcmData.type === 'plan';
+    const typeKor = isPlan ? '계획' : '일정';
+
     if (fcmData.notification === '0') {
-      return `${fcmData.name} 계획 시간이에요!`;
+      return `${fcmData.name} ${typeKor} 시간이에요!`;
     }
     if (fcmData.notification === '60') {
-      return `${fcmData.name} 계획이 1시간 뒤 예정되어 있어요!`;
+      return `${fcmData.name} ${typeKor}이 1시간 뒤 예정되어 있어요!`;
     }
-    return `${fcmData.name} 계획이 ${fcmData.notification}분 뒤 예정되어 있어요!`;
+    return `${fcmData.name} ${typeKor}이 ${fcmData.notification}분 뒤 예정되어 있어요!`;
   }
 }
