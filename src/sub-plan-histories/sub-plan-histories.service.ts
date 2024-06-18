@@ -14,7 +14,7 @@ export class SubPlanHistoriesService {
   ) {}
 
   async checkSubPlan({ subPlanName, userId }: CreateSubPlanHistoryDto & { userId: number }) {
-    const date = dayjs().add(9, 'day').startOf('date').toDate();
+    const date = dayjs().startOf('date').toDate();
     const foundSubPlanHistory = await this.subPlanHistoryRepository.findOne({
       where: { subPlanName, UserId: userId, date },
     });
