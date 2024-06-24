@@ -19,7 +19,7 @@ export class SubPlanHistoriesService {
     if (foundSubPlanHistory) {
       await this.deleteSubPlanHisotry({ id: foundSubPlanHistory.id });
     } else {
-      await this.postSubPlanHistory({ subPlanName, UserId, date: startOfDay });
+      await this.postSubPlanHistory({ subPlanName, UserId, date: startOfDate });
     }
   }
 
