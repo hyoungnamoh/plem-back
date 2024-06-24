@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import dayjs from 'dayjs';
 import { SubPlanHistories } from 'src/entities/SubPlanHistories';
@@ -13,15 +13,13 @@ export class SubPlanHistoriesService {
     private datasource: DataSource
   ) {}
 
-  async checkSubPlan({ subPlanName, userId }: CreateSubPlanHistoryDto & { userId: number }) {
-    const date = dayjs().startOf('date').toDate();
-    const foundSubPlanHistory = await this.subPlanHistoryRepository.findOne({
-      where: { subPlanName, UserId: userId, date },
-    });
+  async checkSubPlan({ subPlanName, date, UserId }: CreateSubPlanHistoryDto) {
+    const startOfDate = dayjs(date).startOf('date').toDate();
+    const foundSubPlanHistory = await this.getSubPlanHistory({ subPlanName, userId: UserId, date: startOfDate });
     if (foundSubPlanHistory) {
       await this.deleteSubPlanHisotry({ id: foundSubPlanHistory.id });
     } else {
-      await this.postSubPlanHistory({ subPlanName, UserId: userId, date });
+      await this.postSubPlanHistory({ subPlanName, UserId, date: startOfDay });
     }
   }
 
@@ -31,6 +29,14 @@ export class SubPlanHistoriesService {
     subPlanHistory.UserId = UserId;
     subPlanHistory.date = date;
     await this.subPlanHistoryRepository.save(subPlanHistory);
+  }
+
+  async getSubPlanHistory({ userId, subPlanName, date }: { userId: number; subPlanName: string; date: Date }) {
+    const foundSubPlanHistory = await this.subPlanHistoryRepository.findOne({
+      where: { subPlanName, UserId: userId, date },
+    });
+
+    return foundSubPlanHistory;
   }
 
   async deleteSubPlanHisotry({ id }: { id: number }) {

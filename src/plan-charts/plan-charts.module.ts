@@ -10,13 +10,15 @@ import { SubPlans } from 'src/entities/SubPlans';
 import { SubPlansService } from 'src/sub-plans/sub-plans.service';
 import { PlansModule } from 'src/plans/plans.module';
 import { PushNotifications } from 'src/entities/PushNotifications';
+import { SubPlanHistoriesService } from 'src/sub-plan-histories/sub-plan-histories.service';
+import { SubPlanHistories } from 'src/entities/SubPlanHistories';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Users, PlanCharts, SubPlans, Plans, PushNotifications]),
+    TypeOrmModule.forFeature([Users, PlanCharts, SubPlans, Plans, PushNotifications, SubPlanHistories]),
     forwardRef(() => PlansModule),
   ],
   controllers: [PlanChartsController],
-  providers: [PlanChartsService, PlansService, SubPlansService],
+  providers: [PlanChartsService, PlansService, SubPlansService, SubPlanHistoriesService],
 })
 export class PlanChartsModule {}

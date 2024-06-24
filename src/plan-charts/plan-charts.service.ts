@@ -118,7 +118,6 @@ export class PlanChartsService {
   }
 
   async getTodayPlanChart(user: Users) {
-    // 오더바이 추가 필요
     const planCharts = await this.planChartRepository
       .createQueryBuilder('planChart')
       .where('planChart.removed_at is null and planChart.UserId = :userId', {
@@ -298,10 +297,11 @@ export class PlanChartsService {
         });
 
         plan.subPlans.map(async (subPlan) => {
+          const { name } = subPlan;
           if (subPlan.id) {
-            queryRunner.manager.getRepository(SubPlans).update(subPlan.id, subPlan);
+            queryRunner.manager.getRepository(SubPlans).update(subPlan.id, { name });
           } else {
-            queryRunner.manager.getRepository(SubPlans).insert({ ...subPlan, PlanId: plan.id });
+            queryRunner.manager.getRepository(SubPlans).insert({ name, PlanId: plan.id });
           }
         });
       });

@@ -15,7 +15,7 @@ export class SubPlanHistoriesController {
   @Post('')
   @UseGuards(JwtAuthGuard)
   async checkSubPlan(@Body() body: CreateSubPlanHistoryDto, @UserDeco() user: Users) {
-    return await this.subPlanHistoryService.checkSubPlan(Object.assign(body, { userId: user.id }));
+    return await this.subPlanHistoryService.checkSubPlan(Object.assign({ ...body, UserId: user.id }));
   }
 
   @Delete('')
