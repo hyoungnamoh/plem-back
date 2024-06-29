@@ -23,9 +23,9 @@ export class SubPlans {
   @IsNotEmpty()
   PlanId: number;
 
-  @IsString()
-  @IsNotEmpty()
-  @Length(1, 30, { message: '하위 계획명을 적어주세요' })
+  @IsString({ message: '할 일을 입력해주세요.' })
+  @IsNotEmpty({ message: '할 일을 입력해주세요.' })
+  @Length(1, 30, { message: '할 일은 30자까지 입력 가능합니다.' })
   @Column('varchar', { name: 'name', length: 100, nullable: false })
   name: string;
 
